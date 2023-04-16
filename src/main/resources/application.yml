@@ -1,0 +1,49 @@
+chowhound:
+  permit:
+    is-init: true
+    owner: ${custom.owner_number}
+  academic:
+    user-name: ${custom.academic.username}
+    password: ${custom.academic.password}
+  kugou:
+    enable-local: true
+    add-music-mapping: /add
+    index-url: ${custom.kugou.index-url}
+  config:
+    environment: dev
+  chatgpt:
+    token: ${custom.chatgpt.token}
+    api-keys: ${custom.chatgpt.api-keys}
+    cf_clearance: ${custom.chatgpt.cf_clearance}
+  proxy:
+    addr: localhost
+    port: 7890
+  genshin-sign:
+    enable: false
+    default-uid: 131649477
+
+
+
+
+logging:
+  level:
+    per.chowhound: debug
+
+spring:
+  profiles:
+    include: dev
+  aop:
+    auto: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
+  data:
+    mongodb:
+#      uri: mongodb://${custom.mongodb.host}:${custom.mongodb.port}/my_bot
+      uri: mongodb://${custom.mongodb.username}:${custom.mongodb.password}@${custom.mongodb.host}:${custom.mongodb.port}/chowhound_bot
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+#      username: ${custom.mongodb.username}
+#      password: ${custom.mongodb.password}
+      database: chowhound_bot
+      authentication-database: ${spring.data.mongodb.database}
