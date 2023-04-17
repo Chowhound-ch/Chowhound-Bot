@@ -10,8 +10,8 @@ import net.mamoe.mirai.utils.LoggerAdapters.asMiraiLogger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import per.chowhound.bot.mirai.common.CLASS_LOADER
-import per.chowhound.bot.mirai.common.JacksonUtil
+import per.chowhound.bot.mirai.common.utils.JacksonUtil
+import per.chowhound.bot.mirai.common.utils.Utils.CLASS_LOADER
 import java.io.File
 
 @Configuration
@@ -59,6 +59,7 @@ data class MiraiBotInfo(
     var config: MiraiBotConfig = MiraiBotConfig(),
 )
 
+@Suppress("unused")
 data class MiraiPasswordInfo(
     var type: String = TYPE_TEXT,
     var text: String? = null

@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.common
+package per.chowhound.bot.mirai.common.utils
 
 import cn.hutool.extra.spring.SpringUtil
 import com.fasterxml.jackson.databind.JsonNode
@@ -12,6 +12,7 @@ import org.apache.http.client.utils.URIBuilder
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
+import per.chowhound.bot.mirai.common.utils.Logger.logInfo
 import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
@@ -112,6 +113,7 @@ open class HttpBase{
     }
 }
 
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 object HttpProxy: HttpBase(){
 
 
@@ -130,29 +132,9 @@ object HttpProxy: HttpBase(){
         }else{
             logInfo("HttpProxy init proxyAddress: {}, port: {}", proxyAddress, port)
 
-//
-//        System.setProperty("http.proxySet", "true");
-//        // 设置http访问要使用的代理服务器的地址
-//        System.setProperty("http.proxyHost", proxyAddress);
-//        // 设置http访问要使用的代理服务器的端口
-//        System.setProperty("http.proxyPort", port);
-//
-//        System.setProperty("https.proxySet", "true");
-//        // 设置https访问要使用的代理服务器的地址
-//        System.setProperty("https.proxyHost", proxyAddress);
-//        // 设置https访问要使用的代理服务器的端口
-//        System.setProperty("https.proxyPort", port);
-
 
             // 使用代理
             val httpHost = HttpHost(proxyAddress, port.toInt())
-//            val requestConfig = RequestConfig.custom()
-//                .setProxy(httpHost)
-//                .setConnectTimeout(12000)
-//                .setSocketTimeout(12000)
-//                .setConnectionRequestTimeout(12000)
-//                .build()
-
 
             httpClient = HttpClients.custom().setProxy(httpHost).build()
 
@@ -160,35 +142,9 @@ object HttpProxy: HttpBase(){
         }
 
     }
-//
-//    fun doGetBytes(url: String): ByteArray{
-//        val httpGet = url.toHttpGet()
-//        return EntityUtils.toByteArray(httpClient.execute(httpGet).entity)
-//    }
-//
-//    fun doGetStr(url: String): String{
-//        val httpGet = url.toHttpGet()
-//        return EntityUtils.toString(httpClient.execute(httpGet).entity)
-//    }
-//
-//    fun doPostStr(url: String, headers: Array<Header>, entity: HttpEntity): String{
-//        return url.toHttpPost().let {
-//            it.entity = entity
-//            it.setHeaders(headers)
-//            EntityUtils.toString(httpClient.execute(it).entity)
-//        }
-//    }
-//
-//    fun doGetJson(url: String): JsonNode {
-//
-//        return JacksonUtil.readTree(doGetStr(url))
-//    }
-//
-////    fun doPostJson(url: String, headers: Array<Header>, entity: HttpEntity,): JsonNode{
-////        return JacksonUtil.readTree(doPostStr(url, headers, entity))
-////    }
-}
 
+}
+@Suppress("unused")
 object UrlUtil {
     fun String.urlEncode(charset: String = "UTF-8"): String {
         return URLEncoder.encode(this, charset)

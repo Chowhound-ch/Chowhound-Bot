@@ -5,9 +5,10 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Event
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
-import per.chowhound.bot.mirai.common.logInfo
+import per.chowhound.bot.mirai.common.utils.Logger.logInfo
 
 
+@Suppress("unused")
 @Configuration
 class MiraiEventListenerConfiguration {
     @Autowired
@@ -31,6 +32,4 @@ class MiraiEventListenerConfiguration {
 
 }
 
-annotation class Listener{
-
-}
+annotation class Listener
