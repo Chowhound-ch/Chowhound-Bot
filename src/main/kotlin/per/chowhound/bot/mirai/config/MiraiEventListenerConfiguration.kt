@@ -38,4 +38,8 @@ class MiraiEventListenerConfiguration {
 }
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Listener(val priority: EventPriority = EventPriority.NORMAL)
+annotation class Listener(
+    val priority: EventPriority = EventPriority.NORMAL,
+
+    val desc: String = "无描述",
+)
