@@ -12,10 +12,9 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 repositories {
-    mavenLocal()
-    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
 }
+
 ext {
     CORE_VERSION = "2.15.0-M1"
     KOTLINE_COROUTINES_VERSION = "1.5.2"
@@ -50,15 +49,4 @@ tasks.withType(KotlinCompile).configureEach {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-subprojects {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
-
-    dependencyManagement {
-        imports {
-            "org.springframework.boot:spring-boot-dependencies:2.5.6"
-        }
-    }
 }

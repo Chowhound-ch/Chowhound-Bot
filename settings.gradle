@@ -1,1 +1,4 @@
-rootProject.name = 'Chowhound-Bot'
+rootProject.name = 'Chowhound-Bot-Parent'
+include ':Chowhound-Framework'
+include ':Chowhound-Data-Mongo'
+include ':Chowhound-Bot'
