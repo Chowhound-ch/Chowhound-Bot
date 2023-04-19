@@ -3,13 +3,25 @@ package per.chowhound.bot.mirai.framework.common.utils
 import cn.hutool.core.util.ClassUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.nio.file.Path
+import java.nio.file.Paths
 
+/**
+ * @Author: Chowhound
+ * @Date: 2023/4/19 - 17:05
+ * @Description: 一般工具类
+ */
 @Suppress("unused")
 object Utils{
     val CLASS_LOADER: ClassLoader = ClassUtil.getClassLoader()
 
 }
 
+/**
+ * @Author: Chowhound
+ * @Date: 2023/4/19 - 17:05
+ * @Description: 日志工具类
+ */
 @Suppress("unused")
 object LoggerUtils {
     fun  Any.logInfo(msg : String, vararg params: Any) {
@@ -54,4 +66,13 @@ object LoggerUtils {
         }
     }
 
+}
+
+/**
+ * @Author: Chowhound
+ * @Date: 2023/4/19 - 17:05
+ * @Description: 文件路径工具类
+ */
+object FileUrlUtils{
+    fun String.toPath(): Path = Paths.get(this)
 }

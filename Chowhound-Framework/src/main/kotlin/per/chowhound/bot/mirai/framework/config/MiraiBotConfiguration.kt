@@ -10,9 +10,12 @@ import net.mamoe.mirai.utils.LoggerAdapters.asMiraiLogger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import per.chowhound.bot.mirai.framework.common.utils.FileUrlUtils.toPath
 import per.chowhound.bot.mirai.framework.common.utils.JacksonUtil
 import per.chowhound.bot.mirai.framework.common.utils.Utils.CLASS_LOADER
 import java.io.File
+import java.nio.file.Files
+import kotlin.io.path.exists
 
 @Configuration
 class MiraiBotConfiguration {
@@ -22,12 +25,14 @@ class MiraiBotConfiguration {
         val stream = CLASS_LOADER.getResourceAsStream("bots/mirai.bot")
         val (username, passwordInfo, config) = JacksonUtil.objectMapper.readValue(stream, MiraiBotInfo::class.java)
 
+        // 创建bots目录
+        "bots/$username".toPath().run { if (!this.exists()) Files.createDirectory(this)}
 
         // bot启动配置
         fun config(): BotConfiguration.() -> Unit = {
-            fileBasedDeviceInfo()   // 使用设备信息缓存
+            fileBasedDeviceInfo("bots/$username/device.json")   // 使用设备信息缓存
             protocol = config.getProtocol() // 设置协议
-            cacheDir = File("cache/$username") // 设置缓存目录
+            cacheDir = File("bots/$username/cache/") // 设置缓存目录
             botLoggerSupplier = {
                 LoggerFactory.getLogger("net.mamoe.mirai.Bot.${it.id}").asMiraiLogger()
             }// 使用自定义日志
