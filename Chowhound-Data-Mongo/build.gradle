@@ -1,4 +1,6 @@
 
 dependencies {
+
+	implementation project(":Chowhound-Framework")
 	implementation "org.springframework.boot:spring-boot-starter-data-mongodb"
 }

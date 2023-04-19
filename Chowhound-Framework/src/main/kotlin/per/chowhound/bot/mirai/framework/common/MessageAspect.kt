@@ -52,10 +52,14 @@ class MessageAspect(val bot: Bot) {
         }
 
         // 判断权限
-        fun hasNoPermission(number: Long): Boolean = true
+        fun hasNoPermission(number: Long): Boolean = TODO()
 
         // 判断群开机状态
-        fun checkGroupState(number: Long, group: Group): Boolean =  true
+        fun checkGroupState(number: Long, group: Group): Boolean{
+
+
+            return true
+        }
 
         // 判断是否为群消息
         if (event is GroupMessageEvent) {

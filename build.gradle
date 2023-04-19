@@ -1,6 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
+
+
+
     repositories {
         mavenLocal()
         maven { url 'https://maven.aliyun.com/repository/public' }
@@ -10,17 +13,27 @@ buildscript {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:3.0.5"
     }
 
+
+    ext {
+        kotlinVersion= '1.7.10'
+    }
 }
 
+
+
+
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.7.10'
+
+    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
+    id 'org.jetbrains.kotlin.plugin.spring' version "$kotlinVersion"
 }
+
 
 // 引入版本控制
 apply from: 'version.gradle'
 
 allprojects {
+
 
     group = 'per.chowhound.bot.mirai'
     version = '0.0.1-SNAPSHOT'
