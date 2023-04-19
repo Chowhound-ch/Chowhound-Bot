@@ -1,0 +1,20 @@
+ext {
+    versions = [
+            "springBoot": '2.7.6',
+            "kotlin": '1.7.10',
+            "miraiCore": '2.15.0-M1',
+            "kotlinCoroutines": '1.5.2',
+            "hutool": '5.8.15',
+            "httpclient": '4.5.14',
+            "fixProtocol": '1.3.0'
+    ]
+
+    dependencies = [
+            "mirai-core": "net.mamoe:mirai-core:${versions.miraiCore}",
+            "mirai-core-api": "net.mamoe:mirai-core-api:${versions.miraiCore}",
+            "hutool-all": "cn.hutool:hutool-all:${versions.hutool}",
+            "httpclient": "org.apache.httpcomponents:httpclient:${versions.httpclient}",
+            "fix-protocol": "local.mirai:fix-protocol:${versions.fixProtocol}",
+            "kotlinx-coroutines-core": "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlinCoroutines}",
+    ]
+}
