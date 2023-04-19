@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.common.utils
+package per.chowhound.bot.mirai.framework.common.utils
 
 import cn.hutool.extra.spring.SpringUtil
 import com.fasterxml.jackson.databind.*

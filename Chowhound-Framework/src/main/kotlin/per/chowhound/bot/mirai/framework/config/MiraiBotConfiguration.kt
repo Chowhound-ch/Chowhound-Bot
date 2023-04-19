@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.config
+package per.chowhound.bot.mirai.framework.config
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import kotlinx.coroutines.runBlocking
@@ -10,8 +10,8 @@ import net.mamoe.mirai.utils.LoggerAdapters.asMiraiLogger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import per.chowhound.bot.mirai.common.utils.JacksonUtil
-import per.chowhound.bot.mirai.common.utils.Utils.CLASS_LOADER
+import per.chowhound.bot.mirai.framework.common.utils.JacksonUtil
+import per.chowhound.bot.mirai.framework.common.utils.Utils.CLASS_LOADER
 import java.io.File
 
 @Configuration

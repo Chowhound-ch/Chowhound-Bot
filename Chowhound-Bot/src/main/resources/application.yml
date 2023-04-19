@@ -1,0 +1,41 @@
+#chowhound:
+#  permit:
+#    is-init: true
+#    owner: ${custom.owner_number}
+#  academic:
+#    user-name: ${custom.academic.username}
+#    password: ${custom.academic.password}
+#  kugou:
+#    enable-local: true
+#    add-music-mapping: /add
+#    index-url: ${custom.kugou.index-url}
+#  config:
+#    environment: dev
+#  chatgpt:
+#    token: ${custom.chatgpt.token}
+#    api-keys: ${custom.chatgpt.api-keys}
+#    cf_clearance: ${custom.chatgpt.cf_clearance}
+#  proxy:
+#    addr: localhost
+#    port: 7890
+#  genshin-sign:
+#    enable: false
+#    default-uid: 131649477
+
+chowhound:
+  storage:
+    type: mongo # 可选mongo, mysql, local (本地文件)
+
+logging:
+  level:
+    per.chowhound: debug
+
+spring:
+  profiles:
+    include: dev, ${chowhound.storage.type}
+  aop:
+    auto: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false

@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.common.utils
+package per.chowhound.bot.mirai.framework.common.utils
 
 import cn.hutool.core.util.ClassUtil
 import org.slf4j.Logger
@@ -11,7 +11,7 @@ object Utils{
 }
 
 @Suppress("unused")
-object Logger {
+object LoggerUtils {
     fun  Any.logInfo(msg : String, vararg params: Any) {
         Log.log(this.javaClass, Log.LogLevel.INFO, msg, params)
     }

@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.common.utils
+package per.chowhound.bot.mirai.framework.common.utils
 
 import cn.hutool.extra.spring.SpringUtil
 import com.fasterxml.jackson.databind.JsonNode
@@ -12,7 +12,7 @@ import org.apache.http.client.utils.URIBuilder
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
-import per.chowhound.bot.mirai.common.utils.Logger.logInfo
+import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder

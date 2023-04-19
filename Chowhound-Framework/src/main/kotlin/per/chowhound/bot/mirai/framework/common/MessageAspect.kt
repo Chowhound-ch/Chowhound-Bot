@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.common
+package per.chowhound.bot.mirai.framework.common
 
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
@@ -9,8 +9,8 @@ import net.mamoe.mirai.event.events.GroupTempMessageEvent
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.springframework.context.annotation.Configuration
-import per.chowhound.bot.mirai.common.utils.Logger.logInfo
-import per.chowhound.bot.mirai.config.Listener
+import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
+import per.chowhound.bot.mirai.framework.config.Listener
 
 /**
  * @Author: Chowhound
