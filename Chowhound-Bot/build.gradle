@@ -24,6 +24,9 @@ ext {
 }
 dependencies {
 
+    implementation project(":Chowhound-Framework")
+    implementation project(":Chowhound-Data-Mongo")
+
     runtimeOnly "net.mamoe:mirai-core:$CORE_VERSION" // mirai-core 的 API
     compileOnly "net.mamoe:mirai-core-api:$CORE_VERSION" // mirai-core 的 API
     implementation "org.springframework.boot:spring-boot-starter"
