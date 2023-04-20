@@ -1,6 +1,7 @@
 package per.chowhound.bot.mirai.framework.components.state
 
 import jakarta.annotation.Resource
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import org.springframework.stereotype.Controller
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
@@ -17,8 +18,8 @@ class GroupStateListener {
     @Resource
     lateinit var groupStateService: GroupStateService
 
-    @Listener
+    @Listener(pattern = "^/update")
     fun GroupMessageEvent.updateGroupState() {
-
+        runBlocking { sender.group.sendMessage("请输入新的群状态") }
     }
 }
