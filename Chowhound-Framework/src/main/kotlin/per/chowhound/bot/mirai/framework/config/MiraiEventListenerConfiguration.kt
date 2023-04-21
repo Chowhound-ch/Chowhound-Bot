@@ -13,9 +13,12 @@ import net.mamoe.mirai.message.data.content
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.AliasFor
+import org.springframework.core.annotation.AnnotationUtils
+import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import per.chowhound.bot.mirai.framework.config.exception.ListenerNoAnnotationException
 import per.chowhound.bot.mirai.framework.config.exception.ListenerWithNoEventException
-import per.chowhound.bot.mirai.framework.config.utils.SyntaxUtil
+import per.chowhound.bot.mirai.framework.config.exception.PatternErrorException
 import java.lang.reflect.Method
 import kotlin.coroutines.*
 import kotlin.reflect.KFunction
@@ -24,7 +27,6 @@ import kotlin.reflect.full.callSuspend
 import kotlin.reflect.jvm.kotlinFunction
 
 
-@Suppress("unused")
 @Configuration
 class MiraiEventListenerConfiguration {
     @Autowired
@@ -47,6 +49,7 @@ class MiraiEventListenerConfiguration {
 
 
                 bot.eventChannel.subscribeAlways(listenerFun.eventClass, priority = listenerFun.listener.priority, handler = listenerFun.getCallFunction())
+                logInfo("注册监听器：{}.{}({})",listenerFun.bean.javaClass, listenerFun.method.name, listenerFun.listener.desc)
             }
         }
     }
@@ -75,7 +78,8 @@ class MiraiEventListenerConfiguration {
         companion object{
             @Suppress("UNCHECKED_CAST")
             fun create(bean: Any, method: Method): ListenerFunction {
-                val listener = method.getAnnotation(Listener::class.java) ?: throw ListenerNoAnnotationException("监听方法必须有Listener注解")
+                //AliasFor注解必须用该方法才能在反射时正常调用
+                val listener = AnnotationUtils.getAnnotation(method, Listener::class.java) ?: throw ListenerNoAnnotationException("监听方法必须有Listener注解")
                 val eventClass = method.parameterTypes.find { Event::class.java.isAssignableFrom(it) } ?: throw ListenerWithNoEventException("监听方法的参数中必须有Event类型的参数")
 
                 method.isAccessible = true
@@ -183,11 +187,6 @@ class MiraiEventListenerConfiguration {
         val fieldMap: LinkedHashMap<String, String> = linkedMapOf(),// key:fieldName, value:pattern
         val regParts: MutableList<String> = ArrayList(),// 正则表达式的各个部分
     ){
-        val desReg: String // 用于匹配消息内容的正则表达式 /.+pattern
-            get() {
-                return regParts.joinToString(separator = "")
-            }
-
         // 用于匹配消息内容的正则表达式，带有分组 /.+(?<name>pattern)
         fun getRegWithGroup(): String {
             val regWithGroup = StringBuilder(regParts[0])
@@ -204,16 +203,65 @@ class MiraiEventListenerConfiguration {
         }
     }
 }
+
+/**
+ * @Author: Chowhound
+ * @Date: 2023/4/21 - 15:48
+ * @Description:
+ */
+object SyntaxUtil {
+    // 解析{{name,pattern}}语法
+    fun spiltPattern(pattern: String): MiraiEventListenerConfiguration.CustomPattern {
+        val customPattern = MiraiEventListenerConfiguration.CustomPattern()
+
+
+        var tempPattern = pattern // 用于替换正则表达式中的{{name,pattern}}语法
+        var prefixStr: List<String>
+        do {
+            prefixStr = tempPattern.split("{{")
+
+            customPattern.regParts.add(prefixStr[0])
+            if (prefixStr.size == 1){
+                break
+            }
+            val suffixStr = prefixStr[1].split("}}")
+            if (suffixStr.size == 1){
+                throw PatternErrorException("表达式语法错误，缺少}}")
+            }
+
+            suffixStr[0].let {// it :  name,pattern
+                var split = it.split(",")
+                if (split.size == 1){
+//                    throw PatternErrorException("表达式语法错误，期望的语法:{{name,pattern}}")
+                    // {{msg}} -> {{msg,.*}}
+                    split = listOf(split[0], ".*")
+                }
+                customPattern.regParts.add(split[1])
+                customPattern.fieldMap[split[0]] = split[1]
+            }
+
+            tempPattern = suffixStr[1]
+        } while  (true)
+
+
+        return customPattern
+    }
+}
 @Suppress("unused")
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Listener(
+    @get:AliasFor("pattern")
+    val value: String = "",
+
     val priority: EventPriority = EventPriority.NORMAL,
+    @get:AliasFor("value")
     val pattern: String = "", // 正则表达式，用于匹配消息内容
 
     val desc: String = "无描述",
 
-    val isBoot: Boolean = true // 监听是否需要开机，为 false 时关机不监听
+    val isBoot: Boolean = true,// 监听是否需要开机，为 false 时关机不监听
+
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
