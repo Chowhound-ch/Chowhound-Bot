@@ -14,11 +14,11 @@ import per.chowhound.bot.mirai.framework.config.Listener
  * @Description:
  */
 
+@Suppress("unused")
 @Controller
 class GroupStateListener {
     @Resource
     lateinit var groupStateService: GroupStateService
-
     @Listener(pattern = "^/update{{msg,.*}}")
     fun GroupMessageEvent.updateGroupState(testValue: String?, @FilterValue("msg") msg: String) {
         runBlocking { sender.group.sendMessage("请输入新的群状态 $msg --- $testValue") }
