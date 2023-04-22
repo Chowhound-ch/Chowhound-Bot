@@ -17,8 +17,9 @@ import per.chowhound.bot.mirai.framework.config.Listener
 class GroupStateListener {
     @Resource
     lateinit var groupStateService: GroupStateService
-    @Listener("^/update{{msg}}")
-    suspend fun GroupMessageEvent.updateGroupState(msg: String) {
-        sender.group.sendMessage("请输入新的群状态 $msg ")
+
+    @Listener("^/status\\s*{{desState}}")
+    suspend fun GroupMessageEvent.updateGroupState(desState: String) {
+
     }
 }

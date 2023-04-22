@@ -261,7 +261,6 @@ annotation class Listener(
     val desc: String = "无描述",
 
     val isBoot: Boolean = true,// 监听是否需要开机，为 false 时关机不监听
-
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
