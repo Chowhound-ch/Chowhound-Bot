@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
+import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.config.exception.ListenerNoAnnotationException
 import per.chowhound.bot.mirai.framework.config.exception.ListenerWithNoEventException
 import per.chowhound.bot.mirai.framework.config.exception.PatternErrorException
@@ -261,6 +262,7 @@ annotation class Listener(
     val desc: String = "无描述",
 
     val isBoot: Boolean = true,// 监听是否需要开机，为 false 时关机不监听
+    val permitEnum: PermitEnum = PermitEnum.ALL,// 监听方法的权限
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
