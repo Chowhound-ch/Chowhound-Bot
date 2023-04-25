@@ -25,6 +25,7 @@
 chowhound:
   storage:
     type: mongo # 可选mongo, mysql, local (本地文件)
+  owner: 825352674 # 机器人主人QQ号
 
 logging:
   level:
@@ -32,7 +33,7 @@ logging:
 
 spring:
   profiles:
-    include: dev, ${chowhound.storage.type}
+    include: dev, ${chowhound.storage.type:local}
   aop:
     auto: false
   jackson:

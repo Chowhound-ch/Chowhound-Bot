@@ -212,6 +212,7 @@ class MiraiEventListenerConfiguration {
  */
 object SyntaxUtil {
     // 解析{{name,pattern}}语法
+    // TODO 多参数时有bug
     fun spiltPattern(pattern: String): MiraiEventListenerConfiguration.CustomPattern {
         val customPattern = MiraiEventListenerConfiguration.CustomPattern()
 
@@ -234,8 +235,9 @@ object SyntaxUtil {
                 var split = it.split(",")
                 if (split.size == 1){
 //                    throw PatternErrorException("表达式语法错误，期望的语法:{{name,pattern}}")
-                    // {{msg}} -> {{msg,.*}}
-                    split = listOf(split[0], ".*")
+                    // msg为除了{{以外的任何字符串，
+                    // {{msg}} -> {{msg,[^({{)]*}}
+                    split = listOf(split[0], "[^({{)]*")
                 }
                 customPattern.regParts.add(split[1])
                 customPattern.fieldMap[split[0]] = split[1]
@@ -262,7 +264,7 @@ annotation class Listener(
     val desc: String = "无描述",
 
     val isBoot: Boolean = false,// 监听是否需要开机，为 false 时关机不监听
-    val permitEnum: PermitEnum = PermitEnum.ALL,// 监听方法的权限
+    val permit: PermitEnum = PermitEnum.ALL,// 监听方法的权限
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER)

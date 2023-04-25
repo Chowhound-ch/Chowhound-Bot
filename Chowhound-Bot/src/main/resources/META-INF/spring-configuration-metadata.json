@@ -1,0 +1,31 @@
+{
+  "properties": [
+    {
+      "name": "chowhound.owner",
+      "type": "java.lang.Long",
+      "description": "机器人主人QQ号."
+    },
+    {
+      "name": "chowhound.storage.type",
+      "type": "per.chowhound.bot.mirai.framework.config.StorageType",
+      "defaultValue": "LOCAL",
+      "description": "存储数据的方式.",
+      "hints": {
+        "valueHints": [
+          {
+            "value": "MONGO",
+            "description": "Use MongoDB for storage."
+          },
+          {
+            "value": "MYSQL",
+            "description": "Use MySQL for storage."
+          },
+          {
+            "value": "LOCAL",
+            "description": "Use local file for storage."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-package per.chowhound.bot.mirai.data.mongo
+package per.chowhound.bot.mirai.data.mongo.state
 
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CachePut
