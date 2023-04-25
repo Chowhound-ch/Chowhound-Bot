@@ -22,7 +22,7 @@ class GroupStateListener {
     @Resource
     lateinit var groupStateService: GroupStateService
 
-    @Listener("^/status\\s*{{desState}}", permitEnum = PermitEnum.ADMIN)
+    @Listener("^/status\\s*{{desState}}", permitEnum = PermitEnum.ADMIN, isBoot = true, desc = "修改群状态")
     suspend fun GroupMessageEvent.updateGroupState(desState: String) {
 
         val groupState = groupStateService.getGroupState(group.id)

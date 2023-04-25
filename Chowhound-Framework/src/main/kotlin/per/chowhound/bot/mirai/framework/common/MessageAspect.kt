@@ -8,8 +8,11 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.GroupTempMessageEvent
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
+import org.aspectj.lang.annotation.Aspect
 import org.springframework.context.annotation.Configuration
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
+import per.chowhound.bot.mirai.framework.components.state.enums.GroupStateEnum
+import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
 import per.chowhound.bot.mirai.framework.config.Listener
 
 /**
@@ -17,12 +20,13 @@ import per.chowhound.bot.mirai.framework.config.Listener
  * @Date: 2023/4/17 - 20:43
  * @Description: TODO 对监听器的切面
  */
+@Aspect
 @Suppress("unused")
 @Configuration
-class MessageAspect(val bot: Bot) {
+class MessageAspect(val bot: Bot, val groupStateService: GroupStateService) {
 
     // 消息监听，拦截所有带有@Listener注解的方法
-    @Around("@annotation(per.chowhound.bot.mirai.config.Listener) && @annotation(annotation))")
+    @Around("@annotation(per.chowhound.bot.mirai.framework.config.Listener) && @annotation(annotation))")
     fun ProceedingJoinPoint.doAroundAdvice(annotation: Listener): Any? {
         // 参数无Event则直接执行
         val event = args.find { it is Event } ?: return proceed()
@@ -52,13 +56,16 @@ class MessageAspect(val bot: Bot) {
         }
 
         // 判断权限
-        fun hasNoPermission(number: Long): Boolean = TODO()
+        fun hasNoPermission(number: Long): Boolean = true
 
         // 判断群开机状态
         fun checkGroupState(number: Long, group: Group): Boolean{
+            if (annotation.isBoot) {
+                return true
+            }
+            val desGroup = groupStateService.getGroupState(group.id)
 
-
-            return true
+            return desGroup.state?.state == GroupStateEnum.START.state
         }
 
         // 判断是否为群消息

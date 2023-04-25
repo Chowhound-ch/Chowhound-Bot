@@ -261,7 +261,7 @@ annotation class Listener(
 
     val desc: String = "无描述",
 
-    val isBoot: Boolean = true,// 监听是否需要开机，为 false 时关机不监听
+    val isBoot: Boolean = false,// 监听是否需要开机，为 false 时关机不监听
     val permitEnum: PermitEnum = PermitEnum.ALL,// 监听方法的权限
 )
 
