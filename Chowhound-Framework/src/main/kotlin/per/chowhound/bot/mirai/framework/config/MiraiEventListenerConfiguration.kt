@@ -226,7 +226,7 @@ class MiraiEventListenerConfiguration {
  * @Description:
  */
 object SyntaxUtil {
-    private const val defaultRegPart = "\\S*" // 默认的正则表达式部分
+    private const val defaultRegPart = "\\S*" // 默认得正则表达式部分
     const val placeholder = "#-" // 占位符
 
     // 解析{{name,pattern}}语法

@@ -12,6 +12,7 @@ import per.chowhound.bot.mirai.framework.config.Listener
  * @Date: 2023/4/25 - 14:33
  * @Description:
  */
+@Suppress("unused")
 @Controller
 class PermitListener(val permitService: PermitService) {
 
@@ -21,6 +22,13 @@ class PermitListener(val permitService: PermitService) {
             send("不能修改非群成员的权限")
             return
         }
+
+        when(qqNumber){
+            group.botAsMember.id -> { send("不能修改机器人的权限");return }
+            group.owner.id -> { send("不能修改owner的权限");return }
+            sender.id -> { send("不能修改自己的权限");return }
+        }
+
 
         val permit = PermitEnum.getPermit(desPermit)
         val newPermit = permitService.setPermit(qqNumber, permit)
