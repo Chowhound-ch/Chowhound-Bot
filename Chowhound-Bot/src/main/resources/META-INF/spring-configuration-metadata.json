@@ -6,6 +6,11 @@
       "description": "机器人主人QQ号."
     },
     {
+      "name": "chowhound.kugou.enable-local",
+      "type": "java.lang.String",
+      "description": "Description for chowhound.kugou.enable-local."
+    },
+    {
       "name": "chowhound.storage.type",
       "type": "per.chowhound.bot.mirai.framework.config.StorageType",
       "defaultValue": "LOCAL",

@@ -1,14 +1,14 @@
-#chowhound:
+chowhound:
 #  permit:
 #    is-init: true
 #    owner: ${custom.owner_number}
 #  academic:
 #    user-name: ${custom.academic.username}
 #    password: ${custom.academic.password}
-#  kugou:
-#    enable-local: true
-#    add-music-mapping: /add
-#    index-url: ${custom.kugou.index-url}
+  kugou:
+    enable-local: true
+    add-music-mapping: /add
+    index-url: ${custom.kugou.index-url}
 #  config:
 #    environment: dev
 #  chatgpt:
@@ -18,11 +18,6 @@
 #  proxy:
 #    addr: localhost
 #    port: 7890
-#  genshin-sign:
-#    enable: false
-#    default-uid: 131649477
-
-chowhound:
   storage:
     type: mongo # 可选mongo, mysql, local (本地文件)
   owner: 825352674 # 机器人主人QQ号
