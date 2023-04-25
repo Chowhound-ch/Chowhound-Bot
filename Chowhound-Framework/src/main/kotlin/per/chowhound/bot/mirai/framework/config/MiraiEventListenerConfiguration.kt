@@ -164,9 +164,6 @@ class MiraiEventListenerConfiguration {
 
             val matchResult = customPattern!!.getRegWithGroup().toRegex().find(msg) ?: return null
 
-//                if (it.value != msg){// 如果正则表达式匹配不到整个消息，则返回null
-//                    return null
-//                }
             for (i in 1 until matchResult.groupValues.size) {
                 argsMap[customPattern!!.fieldMap.keys.elementAt(i - 1)] = matchResult.groupValues[i]
             }
@@ -219,31 +216,12 @@ object SyntaxUtil {
     const val placeholder = "#-" // 占位符
 
     // 解析{{name,pattern}}语法
-    // TODO 多参数时有bug
     // 由于该方法仅在init阶段调用，所以不需要考虑性能，直接使用正则表达式解析{{name,pattern}}语法
     fun spiltPattern(pattern: String): MiraiEventListenerConfiguration.CustomPattern {
         val customPattern = MiraiEventListenerConfiguration.CustomPattern()
-//        "(\\{\\{.+}})".toRegex().findAll(pattern).forEach {
-//            val groupValue = it.groupValues[0]
-//            val split = groupValue.split(",")
-//            val fieldName = split[0].substring(2)
-//            val fieldPattern = when (split.size) {
-//                1 -> {
-//                    "[^({{)]*"
-//                }
-//                2 -> {
-//                    split[1].substring(0, split[1].length - 2)
-//                }
-//                else -> {
-//                    throw PatternErrorException("pattern语法错误")
-//                }
-//            }
-//            customPattern.fieldMap[fieldName] = fieldPattern
-//        }
 
         pattern.split("{{").forEach {
             val splitParts = it.split("}}")
-//            customPattern.regParts.add(split[0])
             when (splitParts.size) {
                 1 -> customPattern.regParts.add(splitParts[0]) // 没有{{name,pattern}}语法
                 2 -> {// 可能为["name,pattern", "..."]或["name", "..."]
@@ -268,45 +246,6 @@ object SyntaxUtil {
                 else -> throw PatternErrorException("pattern语法错误")
             }
         }
-
-
-//        var tempPattern = pattern // 用于替换正则表达式中的{{name,pattern}}语法
-//        var syntaxParts: List<String> = tempPattern.split("{{")
-//        for (syntaxPart in syntaxParts) {
-//            var key = ""
-//            var value = ""
-//
-//            val strings = syntaxPart.split("}}")
-//            if (strings.size != 1) { // 即syntaxPart中包含{{name,pattern}}语法strings为["name,pattern", "..."]或["name", "..."]
-//                var split = strings[0].split(",")
-//
-//            }
-//
-//
-//            customPattern.regParts.add(prefixStr[0])
-//            if (prefixStr.size == 1){
-//                break
-//            }
-//            val suffixStr = prefixStr[1].split("}}")
-//            if (suffixStr.size == 1){
-//                throw PatternErrorException("表达式语法错误，缺少}}")
-//            }
-//
-//            suffixStr[0].let {// it :  name,pattern
-//                var split = it.split(",")
-//                if (split.size == 1){
-////                    throw PatternErrorException("表达式语法错误，期望的语法:{{name,pattern}}")
-//                    // msg为除了{{以外的任何字符串，
-//                    // {{msg}} -> {{msg,[^({{)]*}}
-//                    split = listOf(split[0], "[^({{)]*")
-//                }
-//                customPattern.regParts.add(split[1])
-//                customPattern.fieldMap[split[0]] = split[1]
-//            }
-//
-//            tempPattern = suffixStr[1]
-//        }
-
 
         return customPattern
     }
