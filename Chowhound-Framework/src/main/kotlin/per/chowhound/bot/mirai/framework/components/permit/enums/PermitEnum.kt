@@ -10,7 +10,7 @@ enum class PermitEnum(val level: Int) {
     /**
      * 不做要求
      */
-    ALL(0),
+    MEMBER(0),
     /**
      * bot主人
      */
@@ -23,19 +23,19 @@ enum class PermitEnum(val level: Int) {
     companion object {
         fun getPermit(level: Int): PermitEnum {
             return when (level) {
-                0 -> ALL
+                0 -> MEMBER
                 1 -> ADMIN
                 2 -> OWNER
-                else -> ALL
+                else -> MEMBER
             }
         }
 
         fun getPermit(permit: String): PermitEnum {
             return when (permit.uppercase()) {
-                "NONE" -> ALL
+                "NONE" -> MEMBER
                 "ADMIN" -> ADMIN
                 "OWNER" -> OWNER
-                else -> ALL
+                else -> MEMBER
             }
         }
     }

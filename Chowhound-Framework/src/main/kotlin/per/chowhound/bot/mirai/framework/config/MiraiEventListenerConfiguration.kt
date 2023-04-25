@@ -25,6 +25,7 @@ import kotlin.coroutines.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.createType
 import kotlin.reflect.jvm.kotlinFunction
 
 
@@ -136,12 +137,25 @@ class MiraiEventListenerConfiguration {
                         args.add(event)
                     }
                     else -> {
+                        fun getArg(arg: String?, kParameter: KParameter): Any? {
+                            return when(kParameter.type) {
+                                Long::class.createType() -> arg?.toLong()
+                                Int::class.createType() -> arg?.toInt()
+                                Float::class.createType() -> arg?.toFloat()
+                                Double::class.createType() -> arg?.toDouble()
+                                Boolean::class.createType() -> arg?.toBoolean()
+                                else -> arg
+                            }
+                        }
+
                         // 如果参数有FilterValue注解，则filterValue.value作为key从argsMap中取出对应的值，
                         // 否则kParameter.name作为key从argsMap中取出对应的值
-                        (kParameter.annotations.find { annotation -> annotation is FilterValue }
-                                as? FilterValue)
-                            ?.let { filterValue -> args.add(argsMap[filterValue.value]) }
-                            ?: run { args.add(argsMap[kParameter.name]) }
+                        (kParameter.annotations.find { annotation -> annotation is FilterValue } as? FilterValue)
+                            ?.let { filterValue -> args.add(getArg(argsMap[filterValue.value], kParameter)) }
+                            ?: run { args.add(getArg(argsMap[kParameter.name], kParameter)) }
+
+
+
                     }
                 }
             }
@@ -264,7 +278,7 @@ annotation class Listener(
     val desc: String = "无描述",
 
     val isBoot: Boolean = false,// 监听是否需要开机，为 false 时关机不监听
-    val permit: PermitEnum = PermitEnum.ALL,// 监听方法的权限
+    val permit: PermitEnum = PermitEnum.MEMBER,// 监听方法的权限
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER)

@@ -11,6 +11,7 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.context.annotation.Configuration
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
+import per.chowhound.bot.mirai.framework.components.permit.service.PermitService
 import per.chowhound.bot.mirai.framework.components.state.enums.GroupStateEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
 import per.chowhound.bot.mirai.framework.config.Listener
@@ -23,7 +24,9 @@ import per.chowhound.bot.mirai.framework.config.Listener
 @Aspect
 @Suppress("unused")
 @Configuration
-class MessageAspect(val bot: Bot, val groupStateService: GroupStateService) {
+class MessageAspect(val bot: Bot,
+                    val groupStateService: GroupStateService,
+                    val permitService: PermitService) {
 
     // 消息监听，拦截所有带有@Listener注解的方法
     @Around("@annotation(per.chowhound.bot.mirai.framework.config.Listener) && @annotation(annotation))")
@@ -56,7 +59,9 @@ class MessageAspect(val bot: Bot, val groupStateService: GroupStateService) {
         }
 
         // 判断权限
-        fun hasNoPermission(number: Long): Boolean = true
+        fun hasNoPermission(number: Long): Boolean{
+            return permitService.getPermit(number).permit!!.isHigherOrEqual(annotation.permit)
+        }
 
         // 判断群开机状态
         fun checkGroupState(number: Long, group: Group): Boolean{

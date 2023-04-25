@@ -18,6 +18,6 @@ class OwnerPermitInspector(val permitService: PermitService,@Value("\${chowhound
     fun init() {
         permitService.setUsedHostPermit(owner, PermitEnum.OWNER)
         permitService.setPermit(owner, PermitEnum.OWNER)
-        logInfo("owner permit init success")
+        logInfo("owner[{}] permit init success", owner)
     }
 }

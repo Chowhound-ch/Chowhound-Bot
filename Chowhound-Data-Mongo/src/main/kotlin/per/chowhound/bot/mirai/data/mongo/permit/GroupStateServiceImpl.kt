@@ -18,6 +18,7 @@ import per.chowhound.bot.mirai.framework.components.permit.service.PermitService
  * @Date: 2023/4/25 - 13:47
  * @Description:
  */
+@Suppress("SpringDataMongoDBJsonFieldInspection")
 @Repository
 interface PermitDetailRepository: MongoRepository<Permit, String> {
     @Query("{qqNumber: ?0}")
@@ -38,7 +39,7 @@ class PermitDetailServiceImpl(val repository: PermitDetailRepository): PermitSer
     @Cacheable(key = "#qqNumber")
     override fun getPermit(qqNumber: Long):Permit {
 
-        return repository.findOneByQqNumber(qqNumber) ?: Permit(qqNumber = qqNumber)
+        return repository.findOneByQqNumber(qqNumber) ?: Permit(qqNumber = qqNumber, permit = PermitEnum.MEMBER)
     }
     @CachePut(key = "#qqNumber")
     override fun setPermit(qqNumber: Long, permit: PermitEnum):Permit {
