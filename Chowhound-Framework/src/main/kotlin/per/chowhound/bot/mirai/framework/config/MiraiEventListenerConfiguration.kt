@@ -11,7 +11,6 @@ import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.content
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
@@ -30,9 +29,7 @@ import kotlin.reflect.jvm.kotlinFunction
 
 
 @Configuration
-class MiraiEventListenerConfiguration {
-    @Autowired
-    private lateinit var bot: Bot
+class MiraiEventListenerConfiguration(val bot: Bot) {
 
     @PostConstruct
     fun init() {
@@ -55,7 +52,6 @@ class MiraiEventListenerConfiguration {
             }
         }
     }
-
 
 
 

@@ -12,7 +12,7 @@ import java.io.IOException
 import java.util.stream.Collectors
 
 /**
- * @author zsck
+ * @author Chowhound
  * @date   2022/11/10 - 12:28
  */
 @Suppress("unused", "SpellCheckingInspection")
@@ -44,6 +44,7 @@ class KuGouMusic: HttpBase() {
 
             return list.toList().stream().limit(number.toLong()).peek {
                 it.audioName = it.audioName?.replace(Regex("</?em>"), "")
+//                it.isLocal = false //默认不是本地音乐
             }.collect(Collectors.toList())as MutableList<Music>
         } catch (e: IOException) {
             e.printStackTrace()

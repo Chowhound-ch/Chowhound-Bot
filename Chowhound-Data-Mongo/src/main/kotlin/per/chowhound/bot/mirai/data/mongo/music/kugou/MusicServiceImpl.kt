@@ -22,6 +22,11 @@ interface MusicRepository: MongoRepository<Music, String>
 class MusicServiceImpl(val musicRepository: MusicRepository): MusicService {
     override fun likeMusic(audioName: String): MutableList<Music> {
         return musicRepository.findAll(Example.of(Music().apply { this.audioNameIndex = audioName }))
+            .stream()
+            .peek {
+                it.isLocal = true
+            }.toList()
+            .toMutableList()
     }
 
 }

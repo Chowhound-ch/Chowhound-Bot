@@ -1,11 +1,14 @@
 package per.chowhound.bot.mirai.framework.components.music.kugou.entity
 
 import com.fasterxml.jackson.annotation.JsonAlias
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
  * @author zsck
  * @date   2022/11/10 - 12:37
  */
+//设置不解析的字段
+@JsonIgnoreProperties(ignoreUnknown = true, value = ["isLocal"])
 @Suppress("memberVisibilityCanBePrivate", "unused")
 class Music{
 
@@ -46,4 +49,7 @@ class Music{
     var albumID: String? = null
 
     var file: ByteArray? = null
+
+    //
+    var isLocal: Boolean = false
 }
