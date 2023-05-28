@@ -10,7 +10,7 @@ import java.util.List;
  * @author QQ:825352674
  * @date 2022/8/11 - 19:40
  */
-@SuppressWarnings("all")
+//@SuppressWarnings("all")
 public class MD5Encoding {
     public static String MD5(String a){
         String urlEn = "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwtbitrate=0callback=callback123clienttime=1600305065609clientver=2000dfid=-inputtype=0iscorrection=1isfuzzy=0keyword="+a+"mid=1600305065609page=1pagesize=30platform=WebFilterprivilege_filter=0srcappid=2919tag=emuserid=-1uuid=1600305065609NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt";

@@ -9,6 +9,7 @@ import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.music.kugou.entity.Music
 import per.chowhound.bot.mirai.framework.config.FilterValue
 import per.chowhound.bot.mirai.framework.config.Listener
+import per.chowhound.bot.mirai.framework.config.waitMessage
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -45,7 +46,13 @@ class KugouListener(val kuGouMusic: KuGouMusic) {
 
 
                 val desIndex = try {
-                    withTimeout(120.seconds){
+                    withTimeout(120.seconds){// TODO
+                        waitMessage<MessageEvent>(filter = {event -> event is MessageEvent && event.sender.id == 825352674L}) { event ->
+
+                            println(event)
+
+
+                        }
 
                         return@withTimeout buildMessageChain {  }
                     }
@@ -54,7 +61,6 @@ class KugouListener(val kuGouMusic: KuGouMusic) {
                     return
                 }
                 searchRes[desIndex[0].content.toInt() - 1]
-
             }
         }
 

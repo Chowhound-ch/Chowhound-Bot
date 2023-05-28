@@ -67,6 +67,9 @@ class KuGouMusic: HttpBase() {
     }
 
 
-    private fun encoding(keyWord: String): String = "https://complexsearch.kugou.com/v2/search/song?callback=callback123&keyword=${URLEncodeUtil.encode(keyWord)}&page=1&pagesize=30&bitrate=0&isfuzzy=0&tag=em&inputtype=0&platform=WebFilter&userid=-1&clientver=2000&iscorrection=1&privilege_filter=0&srcappid=2919&clienttime=1600305065609&mid=1600305065609&uuid=1600305065609&dfid=-&signature=${MD5Encoding.MD5(keyWord)}"
+    private fun encoding(keyWord: String): String = "https://complexsearch.kugou.com/v2/search/song?callback=callback123" +
+            "&keyword=${URLEncodeUtil.encode(keyWord)}&page=1&pagesize=30&bitrate=0&isfuzzy=0&tag=em&inputtype=0&" +
+            "platform=WebFilter&userid=-1&clientver=2000&iscorrection=1&privilege_filter=0&srcappid=2919&" +
+            "clienttime=1600305065609&mid=1600305065609&uuid=1600305065609&dfid=-&signature=${MD5Encoding.MD5(keyWord)}"
 
 }
