@@ -1,7 +1,5 @@
 package per.chowhound.bot.mirai.framework.components.music.kugou
 
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.withTimeout
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.*
 import org.springframework.stereotype.Controller
@@ -10,7 +8,6 @@ import per.chowhound.bot.mirai.framework.components.music.kugou.entity.Music
 import per.chowhound.bot.mirai.framework.config.FilterValue
 import per.chowhound.bot.mirai.framework.config.Listener
 import per.chowhound.bot.mirai.framework.config.waitMessage
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * @Author: Chowhound
@@ -25,7 +22,6 @@ class KugouListener(val kuGouMusic: KuGouMusic) {
     suspend fun MessageEvent.uploadKugouMusic(@FilterValue("param") param: String,
                                               @FilterValue("keyword") keyword: String){
         val searchRes = kuGouMusic.getSearchRes(keyword, if (param.isNotEmpty()) 8 else 1)
-
         val  desMusic = when (searchRes.size) {
             0 -> {
                 send("未找到关键字为 $keyword 的歌曲")
@@ -45,28 +41,24 @@ class KugouListener(val kuGouMusic: KuGouMusic) {
                 }.let { send(it) }
 
 
-                val desIndex = try {
-                    withTimeout(120.seconds){// TODO
-                        waitMessage<MessageEvent>(filter = {event -> event is MessageEvent && event.sender.id == 825352674L}) { event ->
+                val nextMsgEvent = waitMessage{ it.sender.id == 825352674L } ?: run { send("会话超时");return }
 
-                            println(event)
-
-
-                        }
-
-                        return@withTimeout buildMessageChain {  }
-                    }
-                }catch (e: TimeoutCancellationException){
-                    send("会话因超时(120s)自动关闭")
-                    return
-                }
-                searchRes[desIndex[0].content.toInt() - 1]
+                searchRes[nextMsgEvent.message.content.toInt() - 1]
             }
         }
 
-        send(getMusicShare(desMusic)!!)
+        send(
+            desMusic.let {
 
+                if (it.url == null && it.fileHash != null){//如果该音乐不是从本地找到的则从网络获取
+                    kuGouMusic.getMusicUrlByAlbumIDAndHash(it)
+                }else{ it }
 
+            }?.let {
+                if (it.imgUrl == null ) it.imgUrl = sender.avatarUrl
+
+                getMusicShare(it)
+            } ?: buildMessageChain { this.append("未找到结果或歌曲为付费歌曲") })
     }
 
     fun getMusicShare(music: Music): Message?{

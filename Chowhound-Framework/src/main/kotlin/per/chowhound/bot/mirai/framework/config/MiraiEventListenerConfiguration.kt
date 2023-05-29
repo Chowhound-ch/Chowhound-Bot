@@ -3,8 +3,10 @@ package per.chowhound.bot.mirai.framework.config
 import cn.hutool.core.util.ClassUtil
 import cn.hutool.extra.spring.SpringUtil
 import jakarta.annotation.PostConstruct
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.EventPriority
@@ -27,13 +29,26 @@ import kotlin.reflect.KParameter
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.createType
 import kotlin.reflect.jvm.kotlinFunction
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-inline fun <reified E : Event> waitMessage(
-    noinline filter: (Event) -> Boolean = { true },
-    noinline handler: E.(E) -> Unit
-) {
-    GlobalEventChannel.filter(filter = filter).subscribeOnce(handler = handler)
+/**
+ * 持续会话
+ */
+suspend inline fun <reified E : Event> E.waitMessage(
+    time: Duration = 15.seconds,
+    noinline filter: (E) -> Boolean = { true }
+): E? {
+    val deferred = CoroutineScope(Dispatchers.IO).async {
+        GlobalEventChannel.asFlow()
+            .filterIsInstance<E>()
+            .filter(filter)
+            .first()
+    }
+
+    return withTimeoutOrNull(time) { deferred.await() }
 }
+
 
 @Configuration
 class MiraiEventListenerConfiguration(val bot: Bot) {
@@ -317,7 +332,7 @@ object SyntaxUtil {
             throw PatternErrorException("pattern语法错误")
         }
 
-        val patternList = pattern.split("{{").apply {
+        pattern.split("{{").apply {
             if (this.size > 1) {
                 customPattern.isExist = true
             }
