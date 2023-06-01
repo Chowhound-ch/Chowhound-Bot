@@ -31,7 +31,10 @@ class PermitListener(val permitService: PermitService) {
         }
 
 
-        val permit = PermitEnum.getPermit(desPermit)
+        val permit = PermitEnum.getPermit(desPermit) ?: run {
+            send("权限名错误,可选值为${PermitEnum.values().joinToString(",") { it.name.lowercase() }}")
+            return
+        }
         val newPermit = permitService.setPermit(qqNumber, permit)
 
         if (newPermit.permit == permit) {

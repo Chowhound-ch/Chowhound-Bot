@@ -30,12 +30,12 @@ enum class PermitEnum(val level: Int) {
             }
         }
 
-        fun getPermit(permit: String): PermitEnum {
+        fun getPermit(permit: String): PermitEnum? {
             return when (permit.uppercase()) {
                 "NONE" -> MEMBER
                 "ADMIN" -> ADMIN
                 "OWNER" -> OWNER
-                else -> MEMBER
+                else -> null
             }
         }
     }

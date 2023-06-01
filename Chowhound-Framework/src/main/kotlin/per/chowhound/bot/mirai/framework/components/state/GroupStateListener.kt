@@ -1,5 +1,6 @@
 package per.chowhound.bot.mirai.framework.components.state
 
+import cn.hutool.core.util.StrUtil
 import jakarta.annotation.Resource
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
@@ -26,8 +27,15 @@ class GroupStateListener {
     suspend fun GroupMessageEvent.updateGroupState(desState: String) {
 
         val groupState = groupStateService.getGroupState(group.id)
-        val newState = GroupStateEnum.getState(desState).let {
+        val newState = if (StrUtil.isNumeric(desState)){
+            GroupStateEnum.getState(desState.toInt())
+        }else{
+            GroupStateEnum.getState(desState)
+        } ?.let {
             groupStateService.setGroupState(groupState.copy(state = it))
+        } ?: run {
+            send("状态名错误,可选值为${GroupStateEnum.values().joinToString(",") { it.name.lowercase() }}")
+            return
         }
 
         if (newState.state!!.state == groupState.state!!.state) {

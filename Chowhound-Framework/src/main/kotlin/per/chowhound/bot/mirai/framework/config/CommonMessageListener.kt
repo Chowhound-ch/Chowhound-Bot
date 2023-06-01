@@ -2,9 +2,7 @@ package per.chowhound.bot.mirai.framework.config
 
 import net.mamoe.mirai.event.events.MessageEvent
 import org.springframework.stereotype.Component
-import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logDebug
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
-import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 
 /**
  * @author Chowhound
