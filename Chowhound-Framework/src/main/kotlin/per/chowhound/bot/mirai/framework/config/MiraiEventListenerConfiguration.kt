@@ -170,13 +170,20 @@ class ListenerInfo  private constructor(
                 }
                 else -> {
                     fun getArg(arg: String?, kParameter: KParameter): Any? {
+                        var param = arg
+                        param?.run {
+                            if (this.startsWith("@")) {
+                                param = param!!.substring(1)
+                            }
+                        }
+
                         return when(kParameter.type) {
-                            Long::class.createType() -> arg?.toLong()
-                            Int::class.createType() -> arg?.toInt()
-                            Float::class.createType() -> arg?.toFloat()
-                            Double::class.createType() -> arg?.toDouble()
-                            Boolean::class.createType() -> arg?.toBoolean()
-                            else -> arg
+                            Long::class.createType() -> param?.toLong()
+                            Int::class.createType() -> param?.toInt()
+                            Float::class.createType() -> param?.toFloat()
+                            Double::class.createType() -> param?.toDouble()
+                            Boolean::class.createType() -> param?.toBoolean()
+                            else -> param
                         }
                     }
 
@@ -288,42 +295,13 @@ object SyntaxUtil {
 //    private const val DEFAULT_REG_PART = "\\S*" // 默认得正则表达式部分
     private const val DEFAULT_REG_PART = "\\S*" // 默认得正则表达式部分
     const val PLACEHOLDER= "#-#" // 占位符
+    val SPECIAL_CHAR = mapOf("@?" to "@?\\d{6,12}")
 
     // 解析{{name,pattern}}语法
     // 由于该方法仅在init阶段调用，所以不需要考虑性能，直接使用正则表达式解析{{name,pattern}}语法
     fun spiltPattern(pattern: String): CustomPattern {
         val customPattern = CustomPattern()
 
-        /*
-        pattern.split("{{").apply { if (this.size > 1){ customPattern.isExist = true}}.forEach {
-        val splitParts = it.split("}}")
-        when (splitParts.size) {
-        1 -> customPattern.regParts.add(splitParts[0]) // 没有{{name,pattern}}语法
-        2 -> {// 可能为["name,pattern", "..."]或["name", "..."]
-        splitParts[0].split(",").let { split ->
-        when (split.size) {
-        1 -> {
-        customPattern.fieldMap[split[0]] = DEFAULT_REG_PART
-        }
-        2 -> {
-        customPattern.fieldMap[split[0]] = split[1]
-        }
-        else -> throw PatternErrorException("pattern语法错误")
-        }
-
-        customPattern.regParts.add(PLACEHOLDER + split[0])
-        }
-
-
-        if (splitParts[1] == "") { return@forEach }
-        customPattern.regParts.add(splitParts[1])
-        }
-        else -> throw PatternErrorException("pattern语法错误")
-        }
-        }
-        TODO v2优化
-        region v2优化
-        */
         val indexLe = pattern.indexOf("{{")
         val indexRi = pattern.indexOf("}}")
 
@@ -356,7 +334,7 @@ object SyntaxUtil {
                             customPattern.fieldMap[patternSplitComma[0]] = DEFAULT_REG_PART
                         }
                         2 -> {
-                            customPattern.fieldMap[patternSplitComma[0]] = patternSplitComma[1]
+                            customPattern.fieldMap[patternSplitComma[0]] = SPECIAL_CHAR[patternSplitComma[1]] ?: patternSplitComma[1]
                         }
                         else -> throw PatternErrorException("pattern语法错误")
                     }
