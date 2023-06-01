@@ -2,9 +2,9 @@ chowhound:
 #  permit:
 #    is-init: true
 #    owner: ${custom.owner_number}
-#  academic:
-#    user-name: ${custom.academic.username}
-#    password: ${custom.academic.password}
+  academic:
+    user-name: ${custom.academic.username}
+    password: ${custom.academic.password}
   kugou:
     enable-local: true
     add-music-mapping: /add
