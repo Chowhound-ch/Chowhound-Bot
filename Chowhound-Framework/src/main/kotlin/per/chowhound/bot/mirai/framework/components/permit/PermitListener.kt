@@ -16,6 +16,10 @@ import per.chowhound.bot.mirai.framework.config.Listener
 @Controller
 class PermitListener(val permitService: PermitService) {
 
+
+//    @Listener("/permit\\s*{{qqNumber,(@?\\d{5,11})}}\\s*{{desPermit}}", permit = PermitEnum.OWNER, isBoot = true, desc = "修改权限(直接输入qq号和权限名)")
+    // q:为何这个函数method.kotlinFunction为null
+    // a:因为这个函数是suspend的
     @Listener("/permit\\s*{{qqNumber}}\\s*{{desPermit}}", permit = PermitEnum.OWNER, isBoot = true, desc = "修改权限(直接输入qq号和权限名)")
     suspend fun GroupMessageEvent.updatePermit(qqNumber: Long, desPermit: String) {
         if (!group.contains(qqNumber)) {

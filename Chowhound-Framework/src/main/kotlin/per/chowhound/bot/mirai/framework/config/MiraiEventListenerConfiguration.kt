@@ -19,6 +19,7 @@ import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
+import per.chowhound.bot.mirai.framework.config.exception.BotException
 import per.chowhound.bot.mirai.framework.config.exception.ListenerNoAnnotationException
 import per.chowhound.bot.mirai.framework.config.exception.ListenerWithNoEventException
 import per.chowhound.bot.mirai.framework.config.exception.PatternErrorException
@@ -67,8 +68,9 @@ class MiraiEventListenerConfiguration(val bot: Bot) {
 
             for (method in clazz.declaredMethods) {
                 val listenerInfo = try {
+                    if (method.isSynthetic) continue
                     ListenerInfo.create(bean, method)
-                } catch (e: Exception) { continue }
+                } catch (e: BotException) { continue }
 
                 val listenerFunction = listenerInfo.listenerFunction
 
@@ -110,7 +112,6 @@ class ListenerInfo  private constructor(
                 ?: throw ListenerWithNoEventException("监听方法的参数中必须有Event类型的参数")
 
             method.isAccessible = true
-
 
 
             val listenerFunction = ListenerInfo(
