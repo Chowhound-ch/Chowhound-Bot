@@ -2,6 +2,7 @@ package per.chowhound.bot.mirai.data.mongo.academic
 
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Service
@@ -49,6 +50,21 @@ class ScheduleServiceImpl(val repository: ScheduleRepository): ScheduleService {
 
     override fun getFirstDate(): Date {
 //        return getMap(QueryWrapper<Schedule>().select("MIN(date) as date"))["date"] as Date
+
+        // 从mongodb查询Schedule，按date属性排序，取第一个
+
+// 创建一个Query对象
+        val query = Query()
+// 添加排序条件，按date升序
+        query.with(Sort.by(Sort.Direction.ASC, "date"))
+// 添加限制条件，只取第一个
+        query.limit(1)
+// 使用MongoTemplate执行查询
+        val schedule = repository.findAll(Sort.sort(Schedule::class.java).by(Schedule::date).ascending()).first()
+// 或者使用MongoRepository执行查询
+
+
+
 
         return repository.findAll(Sort.sort(Schedule::class.java).by(Schedule::date).ascending()).first().date!!
     }

@@ -2,12 +2,14 @@ package per.chowhound.bot.mirai.framework.components.academic.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.springframework.data.mongodb.core.mapping.Document
 import java.sql.Date
 
 /**
  * @author zsck
  * @date   2022/11/8 - 14:41
  */
+@Document
 @JsonIgnoreProperties("room")
 data class Schedule(
     val id: String? = null,

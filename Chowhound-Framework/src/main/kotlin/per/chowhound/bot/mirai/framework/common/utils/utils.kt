@@ -3,8 +3,12 @@ package per.chowhound.bot.mirai.framework.common.utils
 import cn.hutool.core.util.ClassUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.annotation.AnnotationUtils
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.jvm.javaMethod
 
 /**
  * @Author: Chowhound
@@ -16,6 +20,15 @@ object Utils{
     val CLASS_LOADER: ClassLoader = ClassUtil.getClassLoader()
 
 }
+/**
+ * @author Chowhound
+ * @date   2023/6/6 - 15:50
+ *
+ * AnnotationUtils.getAnnotation()的扩展函数，增加对kotlin反射的支持
+ */
+
+
+
 
 /**
  * @Author: Chowhound

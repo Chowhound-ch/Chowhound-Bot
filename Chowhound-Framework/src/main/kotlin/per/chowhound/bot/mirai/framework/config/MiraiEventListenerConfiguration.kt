@@ -11,10 +11,10 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.MessageSubscribersBuilder
 import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.message.data.content
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
-import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
@@ -51,7 +51,7 @@ suspend inline fun <reified E : Event> E.waitMessage(
 }
 
 
-@Configuration
+//@Configuration
 class MiraiEventListenerConfiguration(val bot: Bot) {
 
     @PostConstruct
@@ -272,7 +272,7 @@ data class CustomPattern(
 
                 // 将groupPart中的()替换为(?:)，要求不捕获
 //                val replace = groupPart?.replace("\\([^(:?)]\\)", "\\(:?\\)")
-                val replace = groupPart?.let { SyntaxUtil.replaceGroup(it) } ?: throw RuntimeException("pattern中的fieldName: $fieldName 在fieldMap中不存在")
+                val replace = groupPart ?: throw RuntimeException("pattern中的fieldName: $fieldName 在fieldMap中不存在")
 
 
 
@@ -295,7 +295,7 @@ object SyntaxUtil {
 //    private const val DEFAULT_REG_PART = "\\S*" // 默认得正则表达式部分
     private const val DEFAULT_REG_PART = "\\S*" // 默认得正则表达式部分
     const val PLACEHOLDER= "#-#" // 占位符
-    val SPECIAL_CHAR = mapOf("@?" to "@?\\d{6,12}")
+    private val SPECIAL_CHAR = mapOf("@?" to "@?\\d{6,12}")
 
     // 解析{{name,pattern}}语法
     // 由于该方法仅在init阶段调用，所以不需要考虑性能，直接使用正则表达式解析{{name,pattern}}语法
@@ -305,13 +305,16 @@ object SyntaxUtil {
         val indexLe = pattern.indexOf("{{")
         val indexRi = pattern.indexOf("}}")
 
+        val patternReal = SyntaxUtil.replaceGroup(pattern)
+
         if (indexLe == -1 || indexRi == -1) {// 没有{{name,pattern}}语法
+            customPattern.regParts.add(patternReal)
             return customPattern
         }else if (indexLe > indexRi) { // {{name,pattern}}语法错误
             throw PatternErrorException("pattern语法错误")
         }
 
-        pattern.split("{{").apply {
+        patternReal.split("{{").apply {
             if (this.size > 1) {
                 customPattern.isExist = true
             }
@@ -357,7 +360,7 @@ object SyntaxUtil {
 
     // 将参数的reg中的()替换为(?:)，要求不捕获
     fun replaceGroup(reg: String): String {
-        val split = reg.split("(")
+//        val split = reg.split("(")
         // ()abc(def)g(hi(jkl))mn
         // split: [ , )abc, def)g, hi, jkl))mn]
         // abc(def)g(hi(jkl))mn
@@ -366,20 +369,20 @@ object SyntaxUtil {
         // abc(defg(hi(jkl)mn
         // split: [abc, defg, hi, jkl)mn]
 
-        val stringBuilder = StringBuilder()
+//        val stringBuilder = StringBuilder()
+//
+//        if (split.size == 1) {// 没有()，直接返回
+//            return reg
+//        }
+//
+//        for (element in split) {
+//            if (element != "") {
+//                stringBuilder.append("(?:$element")
+//            }
+//        }
 
-        if (split.size == 1) {// 没有()，直接返回
-            return reg
-        }
 
-        for (element in split) {
-            if (element != "") {
-                stringBuilder.append("(?:$element")
-            }
-        }
-
-
-        return  stringBuilder.toString()
+        return  reg.replace("(", "(?:")
 
     }
 }
@@ -390,6 +393,8 @@ annotation class Listener(
     @get:AliasFor("pattern")
     val value: String = "",
 
+    val matchType: MatchType = MatchType.REGEX_MATCHES,
+
     val priority: EventPriority = EventPriority.NORMAL,
     @get:AliasFor("value")
     val pattern: String = "", // 正则表达式，用于匹配消息内容
@@ -399,6 +404,70 @@ annotation class Listener(
     val isBoot: Boolean = false,// 监听是否需要开机，为 false 时关机不监听
     val permit: PermitEnum = PermitEnum.MEMBER,// 监听方法的权限
 )
+
+/**
+ *
+ * @author ForteScarlet
+ */
+enum class MatchType(
+    val isPlainText: Boolean,
+) {
+    /**
+     * 全等匹配
+     *
+     * @see StringMatchers.EQUALS
+     */
+    TEXT_EQUALS(true),
+
+    /**
+     * 忽略大小写的全等匹配
+     *
+     * @see StringMatchers.EQUALS_IGNORE_CASE
+     */
+    TEXT_EQUALS_IGNORE_CASE(true),
+
+
+    /**
+     * 首部匹配
+     *
+     * @see StringMatchers.STARTS_WITH
+     */
+    TEXT_STARTS_WITH(true),
+
+    /**
+     * 尾部匹配.
+     *
+     * @see StringMatchers.ENDS_WITH
+     */
+    TEXT_ENDS_WITH(true),
+
+    /**
+     * 包含匹配.
+     *
+     * @see StringMatchers.CONTAINS
+     */
+    TEXT_CONTAINS(true),
+
+    /**
+     * 正则完全匹配. `regex.matches(...)`
+     *
+     * @see KeywordRegexMatchers.MATCHES
+     */
+    REGEX_MATCHES(false),
+
+
+    /**
+     * 正则包含匹配. `regex.find(...)`
+     *
+     * @see KeywordRegexMatchers.CONTAINS
+     */
+    REGEX_CONTAINS(false),
+
+    ;
+
+
+
+}
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
