@@ -109,6 +109,30 @@ class MiraiEventListenerConfiguration(
         bot.eventChannel.subscribeMessages {
             listenerFunctions.forEach{ entry ->
                 entry.value.forEach { pair ->
+
+                    // 正则匹配时获取方法参数
+                    fun MessageEvent.getParams(matchResult: MatchResult): Array<Any?> {
+                        val params = mutableListOf<Any?>()
+                        pair.first.parameters.forEach { param ->
+                            when (param.kind){
+                                KParameter.Kind.INSTANCE -> params.add(entry.key)
+                                KParameter.Kind.EXTENSION_RECEIVER -> params.add(this)
+                                else ->{
+                                    val name =
+                                        param.annotations.find { it == FilterValue::class}
+                                            ?.let { it as FilterValue }?.value
+                                            ?: param.name
+                                            ?: throw RuntimeException("参数${param.name}没有指定名称")
+                                    params.add(matchResult.groups[name]?.value)
+                                }
+                            }
+                        }
+                        return params.toTypedArray()
+                    }
+
+
+
+
                     if (pair.second.isMessageEvent()){
                         val listener = AnnotationUtils.getAnnotation(pair.first.javaMethod!!, Listener::class.java)
                             ?: throw RuntimeException("不是监听器")
@@ -130,11 +154,11 @@ class MiraiEventListenerConfiguration(
                                 pair.first.callSuspend(entry.key, this)
                             }
                             MatchType.REGEX_MATCHES -> matching(listener.value.parseReg().toRegex()) {
-                                pair.first.callSuspend(*getParams(pair, entry.key, it))
+                                pair.first.callSuspend(*getParams(it))
 
                             }
                             MatchType.REGEX_CONTAINS -> finding(listener.value.parseReg().toRegex()) {
-                                pair.first.callSuspend(*getParams(pair, entry.key, it))
+                                pair.first.callSuspend(*getParams(it))
                             }
 
                         }
@@ -151,24 +175,6 @@ class MiraiEventListenerConfiguration(
 
     }
 
-    fun MessageEvent.getParams(pair: Pair<KFunction<*>, KClass<out Event>>, bean: Any, matchResult: MatchResult): Array<Any?> {
-        val params = mutableListOf<Any?>()
-        pair.first.parameters.forEach { param ->
-            when (param.kind){
-                KParameter.Kind.INSTANCE -> params.add(bean)
-                KParameter.Kind.EXTENSION_RECEIVER -> params.add(this)
-                else ->{
-                    val name =
-                        param.annotations.find { it == FilterValue::class}
-                            ?.let { it as FilterValue }?.value
-                            ?: param.name
-                            ?: throw RuntimeException("参数${param.name}没有指定名称")
-                    params.add(matchResult.groups[name]?.value)
-                }
-            }
-        }
-        return params.toTypedArray()
-    }
 
     fun parseEventOfClass(clazz: Class<*>, bean: Any) = clazz.declaredMethods.forEach { functionJava ->
             val function = functionJava.kotlinFunction ?: return@forEach
