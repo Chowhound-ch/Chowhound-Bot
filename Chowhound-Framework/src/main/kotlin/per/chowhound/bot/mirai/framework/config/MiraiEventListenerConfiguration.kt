@@ -1,8 +1,6 @@
-
 package per.chowhound.bot.mirai.framework.config
 
 import cn.hutool.core.util.ClassUtil
-import cn.hutool.extra.spring.SpringUtil
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filter
@@ -13,12 +11,13 @@ import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
-import per.chowhound.bot.mirai.framework.common.MessageSender.reply
-import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.config.EventClassUtil.getIfEvent
 import per.chowhound.bot.mirai.framework.config.EventClassUtil.isEvent
@@ -35,12 +34,22 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
+ * 使用该事件监听扫描注册方法:
+ *  1.复制该文件所有内容
+ *      可删除Listener注解中的属性“val permit: PermitEnum”。
+ *      同时删除import中的“import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum”。
+ *  2.yml中添加配置
+ *
+ */
+
+/**
  * @author Chowhound
  * @date   2023/6/8 - 16:45
  * @description key: 拥有监听方法的bean, value: list集合，其中的元素pair.first为监听方法，pair.second为监听的事件类型
  */
 class ListenerFunctions: MutableMap<Any, MutableList<Pair<KFunction<*>, KClass<out Event>>>> by mutableMapOf()
 
+internal val log = LoggerFactory.getLogger(MiraiEventListenerConfiguration::class.java)
 
 /**
  * @author Chowhound
@@ -85,10 +94,14 @@ class MiraiEventListenerConfiguration(
 ) {
 
     val listenerFunctions = ListenerFunctions()
+    @Autowired
+    lateinit var context: ApplicationContext
+
 
 
     @PostConstruct
     fun init() {
+        // TODO: 根据SpringBoot启动类自动获取包扫描路径
         ClassUtil.scanPackage("per.chowhound.bot.mirai").forEach { clazz ->
 
             if (clazz == MiraiEventListenerConfiguration::class.java){
@@ -96,7 +109,7 @@ class MiraiEventListenerConfiguration(
             }
 
             val bean = try {
-                SpringUtil.getBean(clazz) // 监听方法所在的类的实例
+                context.getBean(clazz) // 监听方法所在的类的实例
             } catch (e: NoSuchBeanDefinitionException){
                 return@forEach
             }
@@ -109,7 +122,12 @@ class MiraiEventListenerConfiguration(
         bot.eventChannel.subscribeMessages {
             listenerFunctions.forEach{ entry ->
                 entry.value.forEach { pair ->
+                    val listener = AnnotationUtils.getAnnotation(pair.first.javaMethod!!, Listener::class.java)
+                        ?: throw RuntimeException("不是监听器")
 
+
+                    log.debug("注册事件监听({}):{} -> {}({})", pair.second.simpleName, entry.key.javaClass.simpleName,
+                        pair.first.name, listener.desc)
                     // 正则匹配时获取方法参数
                     fun MessageEvent.getParams(matchResult: MatchResult): Array<Any?> {
                         val params = mutableListOf<Any?>()
@@ -131,11 +149,7 @@ class MiraiEventListenerConfiguration(
                     }
 
 
-
-
                     if (pair.second.isMessageEvent()){
-                        val listener = AnnotationUtils.getAnnotation(pair.first.javaMethod!!, Listener::class.java)
-                            ?: throw RuntimeException("不是监听器")
 
                         when (listener.matchType) {
                             MatchType.TEXT_EQUALS -> case(listener.value) {
