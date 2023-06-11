@@ -12,21 +12,26 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.events.FriendMessageEvent
+import net.mamoe.mirai.event.events.GroupMessageEvent
+import net.mamoe.mirai.event.events.MessageEvent
 import net.mamoe.mirai.event.subscribeMessages
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
-import per.chowhound.bot.mirai.framework.common.utils.EventClassUtil.getIfEvent
-import per.chowhound.bot.mirai.framework.common.utils.EventClassUtil.isEvent
-import per.chowhound.bot.mirai.framework.common.utils.EventClassUtil.isMessageEvent
+import per.chowhound.bot.mirai.framework.common.MessageSender.reply
 import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
+import per.chowhound.bot.mirai.framework.config.EventClassUtil.getIfEvent
+import per.chowhound.bot.mirai.framework.config.EventClassUtil.isEvent
+import per.chowhound.bot.mirai.framework.config.EventClassUtil.isMessageEvent
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.extensionReceiverParameter
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.kotlinFunction
 import kotlin.time.Duration
@@ -157,6 +162,23 @@ class MiraiEventListenerConfiguration(
 
     }
 
+    fun listener() {
+        bot.eventChannel.subscribeMessages {
+            startsWith("你好") {
+                reply("你好呀")
+            }
+
+            matching("(?<group>.*?)".toRegex()){
+                reply(it.groups["group"]?.value ?: "11")
+            }
+
+            contains("你好"){
+                reply("你好呀")
+            }
+        }
+
+    }
+
     fun parseEventOfClass(clazz: Class<*>, bean: Any) {
         clazz.declaredMethods.forEach { functionJava ->
             val function = functionJava.kotlinFunction ?: return@forEach
@@ -209,6 +231,45 @@ class MiraiEventListenerConfiguration(
     }
 
     fun String.replaceGroupNoCapture() = this.replace("(", "(?:")
+}
+
+
+/**
+ * @author Chowhound
+ * @date   2023/6/6 - 14:33
+ */
+@Suppress("unused")
+object EventClassUtil {
+    fun KClass<*>.isGroupMessageEvent(): Boolean {
+        return this == GroupMessageEvent::class
+    }
+
+    fun KClass<*>.isFriendMessageEvent(): Boolean {
+        return this == FriendMessageEvent::class
+    }
+
+    fun KClass<*>.isMessageEvent(): Boolean {
+        return this.isSubclassOf(MessageEvent::class)
+    }
+
+    fun KClass<*>.isEvent(): Boolean {
+        return this.isSubclassOf(Event::class)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun KClass<*>.getIfEvent(): KClass<out Event>? {
+        return if (Event::class.java.isAssignableFrom(this.java)) {
+            this as KClass<out Event>
+        } else { null }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun KClass<*>.getIfMessageEvent(): KClass<out MessageEvent>? {
+        return if (this.isMessageEvent()) {
+            this as KClass<out MessageEvent>
+        }else{ null }
+    }
+
 }
 
 
