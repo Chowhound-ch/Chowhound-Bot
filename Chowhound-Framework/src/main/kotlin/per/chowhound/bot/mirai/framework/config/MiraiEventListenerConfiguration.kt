@@ -9,13 +9,10 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.EventPriority
-import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import net.mamoe.mirai.event.subscribeMessages
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
@@ -44,10 +41,13 @@ import kotlin.time.Duration.Companion.seconds
  */
 class ListenerFunctions: MutableMap<Any, MutableList<Pair<KFunction<*>, KClass<out Event>>>> by mutableMapOf()
 
+
 /**
- * 持续会话
+ * @author Chowhound
+ * @date   2023/6/11 - 19:26
+ * @description  持续会话
+ * 返回值为空则表示超时
  */
-@Suppress("all")
 suspend inline fun  <reified E : Event> E.waitMessage(
     time: Duration = 15.seconds,
     noinline filter: (E) -> Boolean = { true }
@@ -61,10 +61,23 @@ suspend inline fun  <reified E : Event> E.waitMessage(
 
     return withTimeoutOrNull(time) { deferred.await() }
 }
+suspend inline fun  <reified E : Event> waitMessage(
+    time: Duration = 15.seconds,
+    noinline filter: (E) -> Boolean = { true }
+): E? {
+    val deferred = CoroutineScope(Dispatchers.IO).async {
+        GlobalEventChannel.asFlow()
+            .filterIsInstance<E>()
+            .filter(filter)
+            .first()
+    }
 
+    return withTimeoutOrNull(time) { deferred.await() }
+}
 /**
  * @author Chowhound
  * @date   2023/6/6 - 10:50
+ * 扫描并注册事件监听
  */
 @Configuration
 class MiraiEventListenerConfiguration(
@@ -72,6 +85,7 @@ class MiraiEventListenerConfiguration(
 ) {
 
     val listenerFunctions = ListenerFunctions()
+
 
     @PostConstruct
     fun init() {
@@ -101,51 +115,26 @@ class MiraiEventListenerConfiguration(
 
                         when (listener.matchType) {
                             MatchType.TEXT_EQUALS -> case(listener.value) {
-                                pair.first.call(entry.key, this)
+                                pair.first.callSuspend(entry.key, this)
                             }
                             MatchType.TEXT_EQUALS_IGNORE_CASE -> case(listener.value, ignoreCase = true) {
-                                pair.first.call(entry.key, this)
+                                pair.first.callSuspend(entry.key, this)
                             }
                             MatchType.TEXT_STARTS_WITH -> startsWith(listener.value) {
-                                pair.first.call(entry.key, this)
+                                pair.first.callSuspend(entry.key, this)
                             }
                             MatchType.TEXT_ENDS_WITH -> endsWith(listener.value) {
-                                pair.first.call(entry.key, this)
+                                pair.first.callSuspend(entry.key, this)
                             }
                             MatchType.TEXT_CONTAINS -> contains(listener.value) {
-                                pair.first.call(entry.key, this)
+                                pair.first.callSuspend(entry.key, this)
                             }
                             MatchType.REGEX_MATCHES -> matching(listener.value.parseReg().toRegex()) {
-
-                                fun getParams(): Array<Any?> {
-                                    val params = mutableListOf<Any?>()
-                                    pair.first.parameters.forEach { param ->
-                                        when (param.kind){
-                                            KParameter.Kind.INSTANCE -> params.add(entry.key)
-                                            KParameter.Kind.EXTENSION_RECEIVER -> params.add(this)
-                                            else ->{
-                                                val name =
-                                                    param.annotations.find { it == FilterValue::class}
-                                                        ?.let { it as FilterValue }?.value
-                                                        ?: param.name
-                                                        ?: throw RuntimeException("参数${param.name}没有指定名称")
-                                                params.add(it.groups[name]?.value)
-                                            }
-                                        }
-                                    }
-                                    return params.toTypedArray()
-                                }
-
-
-//                                    pair.first.call(entry.key, this)
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    logInfo("匹配到正则：参数: {}", pair.first.parameters)
-                                    pair.first.callSuspend(*getParams())
-                                }
+                                pair.first.callSuspend(*getParams(pair, entry.key, it))
 
                             }
                             MatchType.REGEX_CONTAINS -> finding(listener.value.parseReg().toRegex()) {
-                                pair.first.call(entry.key, this)
+                                pair.first.callSuspend(*getParams(pair, entry.key, it))
                             }
 
                         }
@@ -162,25 +151,26 @@ class MiraiEventListenerConfiguration(
 
     }
 
-    fun listener() {
-        bot.eventChannel.subscribeMessages {
-            startsWith("你好") {
-                reply("你好呀")
-            }
-
-            matching("(?<group>.*?)".toRegex()){
-                reply(it.groups["group"]?.value ?: "11")
-            }
-
-            contains("你好"){
-                reply("你好呀")
+    fun MessageEvent.getParams(pair: Pair<KFunction<*>, KClass<out Event>>, bean: Any, matchResult: MatchResult): Array<Any?> {
+        val params = mutableListOf<Any?>()
+        pair.first.parameters.forEach { param ->
+            when (param.kind){
+                KParameter.Kind.INSTANCE -> params.add(bean)
+                KParameter.Kind.EXTENSION_RECEIVER -> params.add(this)
+                else ->{
+                    val name =
+                        param.annotations.find { it == FilterValue::class}
+                            ?.let { it as FilterValue }?.value
+                            ?: param.name
+                            ?: throw RuntimeException("参数${param.name}没有指定名称")
+                    params.add(matchResult.groups[name]?.value)
+                }
             }
         }
-
+        return params.toTypedArray()
     }
 
-    fun parseEventOfClass(clazz: Class<*>, bean: Any) {
-        clazz.declaredMethods.forEach { functionJava ->
+    fun parseEventOfClass(clazz: Class<*>, bean: Any) = clazz.declaredMethods.forEach { functionJava ->
             val function = functionJava.kotlinFunction ?: return@forEach
 
             function.annotations.forEach { annotation ->
@@ -202,10 +192,7 @@ class MiraiEventListenerConfiguration(
             }
         }
 
-
-    }
-
-    fun String.parseReg(): String {
+     fun String.parseReg(): String {
         // 解析string中的{key,value}，并将其替换为正则表达式
         val builder = StringBuilder()
         this.split("{").withIndex().forEach { (index, str) ->

@@ -5,7 +5,6 @@ import net.mamoe.mirai.message.data.*
 import org.springframework.stereotype.Controller
 import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.music.kugou.entity.Music
-import per.chowhound.bot.mirai.framework.config.FilterValue
 import per.chowhound.bot.mirai.framework.config.Listener
 import per.chowhound.bot.mirai.framework.config.waitMessage
 
@@ -41,7 +40,7 @@ class KugouListener(val kuGouMusic: KuGouMusic) {
                 }.let { send(it) }
 
 
-                val nextMsgEvent = waitMessage{ it.sender.id == 825352674L } ?: run { send("会话超时");return }
+                val nextMsgEvent = waitMessage { it.sender.id == 825352674L } ?: run { send("会话超时");return }
 
                 searchRes[nextMsgEvent.message.content.toInt() - 1]
             }
