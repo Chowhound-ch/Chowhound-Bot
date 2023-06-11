@@ -29,7 +29,7 @@ class AcademicListener(
     val academic: Academic
 ){
 
-    @Listener("{{index,\\d{1,2}}}")
+    @Listener("{index,\\d{1,2}}")
     suspend fun FriendMessageEvent.viewWeek(index: Long ){
 
 
@@ -38,7 +38,7 @@ class AcademicListener(
         }
     }
 
-    @Listener("(w|W){{param,(\\+|-|=)?}}")
+    @Listener("(w|W){param,(\\+|-|=)?}")
     suspend fun FriendMessageEvent.week(param: String){
         val firstDate = scheduleService.getFirstDate()
         val date = Date.valueOf(DateUtil.today())
@@ -66,7 +66,7 @@ class AcademicListener(
 
     }
 
-    @Listener("(d|D){{param,(\\+|-|=)?}}")
+    @Listener("(d|D){param,(\\+|-|=)?}")
     suspend fun FriendMessageEvent.day(param: String){
         val firstDate = scheduleService.getFirstDate()
         val standard = getBalanceByParam(param)
@@ -87,7 +87,7 @@ class AcademicListener(
             }
         }
     }
-    @Listener("(f|F)\\s*{{name}}")
+    @Listener("(f|F)\\s*{name}")
     suspend fun FriendMessageEvent.find(name: String){
         val classMapList = classMapService.likeClassName(name)
 
