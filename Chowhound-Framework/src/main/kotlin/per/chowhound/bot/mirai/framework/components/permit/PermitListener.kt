@@ -17,7 +17,7 @@ import per.chowhound.bot.mirai.framework.config.Listener
 class PermitListener(val permitService: PermitService) {
 
 
-    @Listener("/permit\\s*{qqNumber,@?}\\s*{{desPermit}", permit = PermitEnum.OWNER, isBoot = true, desc = "修改权限(直接输入qq号和权限名)")
+    @Listener("/permit\\s*{{qqNumber,@?}}\\s*{{desPermit}}", permit = PermitEnum.OWNER, isBoot = true, desc = "修改权限(直接输入qq号和权限名)")
     suspend fun GroupMessageEvent.updatePermit(qqNumber: Long, desPermit: String) {
         if (!group.contains(qqNumber)) {
             send("不能修改非群成员的权限")

@@ -141,7 +141,17 @@ class MiraiEventListenerConfiguration(
                                             ?.let { it as FilterValue }?.value
                                             ?: param.name
                                             ?: throw RuntimeException("参数${param.name}没有指定名称")
-                                    params.add(matchResult.groups[name]?.value)
+
+                                    when(param.type.classifier){
+                                        String::class -> params.add(matchResult.groups[name]?.value)
+                                        Int::class -> params.add(matchResult.groups[name]?.value?.toInt())
+                                        Long::class -> params.add(matchResult.groups[name]?.value?.toLong())
+                                        Double::class -> params.add(matchResult.groups[name]?.value?.toDouble())
+                                        Float::class -> params.add(matchResult.groups[name]?.value?.toFloat())
+                                        Boolean::class -> params.add(matchResult.groups[name]?.value?.toBoolean())
+                                        else -> throw RuntimeException("参数${param.name}类型不支持")
+                                    }
+//                                    params.add(matchResult.groups[name]?.value)
                                 }
                             }
                         }
@@ -215,27 +225,23 @@ class MiraiEventListenerConfiguration(
      fun String.parseReg(): String {
         // 解析string中的{key,value}，并将其替换为正则表达式
         val builder = StringBuilder()
-        this.split("{").withIndex().forEach { (index, str) ->
-            if (index == 0) { builder.append(str); return@forEach }
-            val strList = str.split("}")
-            when (strList.size) {
-                1 -> builder.append(str)
-                2 -> {
-                    val pattern = strList[0].split(",")
-                    when (pattern.size) {
-                        1 -> builder.append("(?<${pattern[0]}>.*?)")
-                        2 -> {
-                            builder.append("(?<${pattern[0]}>${pattern[1].replaceGroupNoCapture()})")
-                        }
-                    }
-
+        split("{{").forEachIndexed { index, str ->
+            if (index == 0) { builder.append(str); return@forEachIndexed }
+            val strList = str.split("}}")
+            if (strList.size == 1) { builder.append(str) }
+            else{
+                val pattern = strList[0].split(",")
+                when (pattern.size) {
+                    1 -> builder.append("(?<${pattern[0]}>.*?)")
+                    2 -> builder.append("(?<${pattern[0]}>${pattern[1].replaceGroupNoCapture()})")
                 }
+                builder.append(strList.subList(1, strList.size).joinToString(""))
             }
-
         }
-
         return builder.toString()
     }
+
+
 
     fun String.replaceGroupNoCapture() = this.replace("(", "(?:")
 }

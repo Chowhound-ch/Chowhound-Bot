@@ -17,7 +17,7 @@ import per.chowhound.bot.mirai.framework.config.waitMessage
 @Controller
 class KugouListener(val kuGouMusic: KuGouMusic) {
 
-    @Listener("^/点歌\\s*{param,(-d|D)?}\\s*{keyword}", desc = "kugou点歌")
+    @Listener("^/点歌\\s*{{param,(-d|D)?}}\\s*{{keyword}}", desc = "kugou点歌")
     suspend fun MessageEvent.kugouMusic(param: String,
                                         keyword: String){
         val searchRes = kuGouMusic.getSearchRes(keyword, if (param.isNotEmpty()) 8 else 1)
