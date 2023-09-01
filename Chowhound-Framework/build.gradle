@@ -6,7 +6,7 @@ dependencies {
 
     implementation "net.sf.ehcache:ehcache:2.10.9.2"
     implementation "org.apache.httpcomponents:httpclient"
-    implementation "local.mirai:fix-protocol"
+//    implementation "local.mirai:fix-protocol"
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-json"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb"

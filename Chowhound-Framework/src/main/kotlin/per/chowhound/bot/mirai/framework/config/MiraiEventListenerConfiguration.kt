@@ -14,6 +14,7 @@ import net.mamoe.mirai.event.events.MessageEvent
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.AliasFor
@@ -22,6 +23,7 @@ import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.config.EventClassUtil.getIfEvent
 import per.chowhound.bot.mirai.framework.config.EventClassUtil.isEvent
 import per.chowhound.bot.mirai.framework.config.EventClassUtil.isMessageEvent
+import java.lang.NullPointerException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -101,8 +103,10 @@ class MiraiEventListenerConfiguration(
 
     @PostConstruct
     fun init() {
-        // TODO: 根据SpringBoot启动类自动获取包扫描路径
-        ClassUtil.scanPackage("per.chowhound.bot.mirai").forEach { clazz ->
+        val scanPath = getScanPath()
+        log.info("开始扫描如下package中事件监听器: {}", scanPath)
+
+        ClassUtil.scanPackage(scanPath).forEach { clazz ->
 
             if (clazz == MiraiEventListenerConfiguration::class.java){
                 return@forEach
@@ -197,6 +201,21 @@ class MiraiEventListenerConfiguration(
             }
         }
 
+    }
+
+    fun getScanPath(): String{
+        val collection = context.getBeansWithAnnotation(SpringBootApplication::class.java).values
+        if (collection.isEmpty()){
+            throw RuntimeException("没有找到SpringBoot启动类")
+        } else if (collection.size > 1){
+            throw RuntimeException("找到多个SpringBoot启动类")
+        }
+
+        val clazz = collection.first().javaClass
+
+        return try{ clazz.getAnnotation(ListenerScan::class.java).value }
+                catch (e : NullPointerException){null}
+                ?: clazz.`package`.name
     }
 
 
@@ -357,3 +376,7 @@ enum class MatchType{
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FilterValue(val value: String)
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ListenerScan(val value: String)
