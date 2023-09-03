@@ -272,34 +272,22 @@ class MiraiEventListenerConfiguration(
  */
 @Suppress("unused")
 object EventClassUtil {
-    fun KClass<*>.isGroupMessageEvent(): Boolean {
-        return this == GroupMessageEvent::class
-    }
+    fun KClass<*>.isGroupMessageEvent(): Boolean = this == GroupMessageEvent::class
 
-    fun KClass<*>.isFriendMessageEvent(): Boolean {
-        return this == FriendMessageEvent::class
-    }
+    fun KClass<*>.isFriendMessageEvent(): Boolean = this == FriendMessageEvent::class
 
-    fun KClass<*>.isMessageEvent(): Boolean {
-        return this.isSubclassOf(MessageEvent::class)
-    }
+    fun KClass<*>.isMessageEvent(): Boolean = this.isSubclassOf(MessageEvent::class)
 
-    fun KClass<*>.isEvent(): Boolean {
-        return this.isSubclassOf(Event::class)
-    }
+    fun KClass<*>.isEvent(): Boolean = this.isSubclassOf(Event::class)
 
     @Suppress("UNCHECKED_CAST")
     fun KClass<*>.getIfEvent(): KClass<out Event>? {
-        return if (Event::class.java.isAssignableFrom(this.java)) {
-            this as KClass<out Event>
-        } else { null }
+        return if (this.isEvent()) { this as KClass<out Event> } else { null }
     }
 
     @Suppress("UNCHECKED_CAST")
     fun KClass<*>.getIfMessageEvent(): KClass<out MessageEvent>? {
-        return if (this.isMessageEvent()) {
-            this as KClass<out MessageEvent>
-        }else{ null }
+        return if (this.isMessageEvent()) { this as KClass<out MessageEvent> }else{ null }
     }
 
 }
