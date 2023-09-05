@@ -50,7 +50,6 @@ class MiraiBotConfiguration {
             BotFactory.newBot(username!!.toLong(), BotAuthorization.byQRCode(), configuration = config()) // 使用md5密码登录
 
         }
-
         runBlocking { bot.login() } // 登录
         return bot
     }

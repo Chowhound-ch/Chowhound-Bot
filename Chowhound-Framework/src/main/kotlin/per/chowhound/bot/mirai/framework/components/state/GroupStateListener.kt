@@ -8,7 +8,7 @@ import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.state.enums.GroupStateEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
-import per.chowhound.bot.mirai.framework.config.Listener
+import per.chowhound.bot.mirai.framework.config.listener.Listener
 
 /**
  * @Author: Chowhound

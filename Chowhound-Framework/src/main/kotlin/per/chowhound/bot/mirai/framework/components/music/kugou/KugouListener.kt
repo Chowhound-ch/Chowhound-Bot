@@ -5,8 +5,8 @@ import net.mamoe.mirai.message.data.*
 import org.springframework.stereotype.Controller
 import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.music.kugou.entity.Music
-import per.chowhound.bot.mirai.framework.config.Listener
-import per.chowhound.bot.mirai.framework.config.waitMessage
+import per.chowhound.bot.mirai.framework.config.listener.Listener
+import per.chowhound.bot.mirai.framework.config.listener.waitMessage
 
 /**
  * @Author: Chowhound

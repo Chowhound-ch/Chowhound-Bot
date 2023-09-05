@@ -14,7 +14,7 @@ import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import per.chowhound.bot.mirai.framework.components.permit.service.PermitService
 import per.chowhound.bot.mirai.framework.components.state.enums.GroupStateEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
-import per.chowhound.bot.mirai.framework.config.Listener
+import per.chowhound.bot.mirai.framework.config.listener.Listener
 
 /**
  * @Author: Chowhound
@@ -29,7 +29,7 @@ class MessageAspect(val bot: Bot,
                     val permitService: PermitService) {
 
     // 消息监听，拦截所有带有@Listener注解的方法
-    @Around("@annotation(per.chowhound.bot.mirai.framework.config.Listener) && @annotation(annotation))")
+    @Around("@annotation(per.chowhound.bot.mirai.framework.config.listener.Listener) && @annotation(annotation))")
     fun ProceedingJoinPoint.doAroundAdvice(annotation: Listener): Any? {
         // 参数无Event则直接执行
         val event = args.find { it is Event } ?: return proceed()

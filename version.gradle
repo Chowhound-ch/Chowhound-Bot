@@ -3,7 +3,7 @@ ext {
 //            "kotlinJvm": '1.7.10',
             "springBoot": '2.7.6',
             "kotlin": '1.7.10',
-            "miraiCore": '2.15.0-M1',
+            "miraiCore": '2.16.0-RC',
             "kotlinCoroutines": '1.5.2',
             "hutool": '5.8.15',
             "httpclient": '4.5.14',

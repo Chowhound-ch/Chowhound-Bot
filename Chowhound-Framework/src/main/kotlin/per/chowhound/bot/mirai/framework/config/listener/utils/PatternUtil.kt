@@ -1,19 +1,17 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package per.chowhound.bot.mirai.framework.config.listener.utils;
+package per.chowhound.bot.mirai.framework.config.listener.utils
 
 import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
-import org.springframework.core.annotation.AliasFor
 import org.springframework.core.annotation.AnnotationUtils
-import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
-import per.chowhound.bot.mirai.framework.config.EventClassUtil.getIfEvent
-import per.chowhound.bot.mirai.framework.config.MatchType
+import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
+import per.chowhound.bot.mirai.framework.config.listener.Listener
+import per.chowhound.bot.mirai.framework.config.listener.log
+import per.chowhound.bot.mirai.framework.config.listener.utils.EventClassUtil.getIfEvent
 import per.chowhound.bot.mirai.framework.config.listener.utils.EventClassUtil.isMessageEvent
-import java.util.HashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -32,9 +30,9 @@ object PatternUtil {
 //    private const val DEFAULT_GROUP_NAME = "DEFAULT"
 
     // `name,\\s+`
-    fun Any.resolve(): List<ListenerPatternInfo> {
+    fun Class<*>.resolve(bean: Any): List<ListenerPatternInfo> {
         val list = ArrayList<ListenerPatternInfo>()
-        this::class.declaredFunctions.forEach { function->
+        this.kotlin.declaredFunctions.forEach { function->
             val listener = AnnotationUtils.getAnnotation(function.javaMethod!!,
                 Listener::class.java) ?: return@forEach
             // 解析事件监听
@@ -46,7 +44,8 @@ object PatternUtil {
                 .limit(1).toList()[0]
             ?: return@forEach
             val event = eventClass.getIfEvent() ?: throw RuntimeException("不是事件类型")
-            val info = ListenerPatternInfo(function = function, eventClass = event, bean = this)
+            val info = ListenerPatternInfo(function = function, eventClass = event,
+                bean = bean, listener = listener)
 
             if (event.isMessageEvent()){
                 val patternMap = HashMap<String, String>()
@@ -108,35 +107,18 @@ object PatternUtil {
     fun String.replaceGroupNoCapture() = this.replace("(", "(?:")
 
 
-    data class ListenerPatternInfo(
-        var raw: String? = null,
-        var regPattern: String? = null,
-//        var regPatternWithGroup: String? = null,
-        var patternMap: Map<String, String>? = null,
-        var function: KFunction<*>,
-        var eventClass: KClass<out Event>,
-        var isMessageEvent: Boolean?  = true,
-        var bean: Any
-        )
+
 }
-
-@Suppress("unused")
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class Listener(
-    @get:AliasFor("pattern")
-    val value: String = "",
-
-    val matchType: MatchType = MatchType.REGEX_MATCHES,
-
-    val priority: EventPriority = EventPriority.NORMAL,
-    @get:AliasFor("value")
-    val pattern: String = "", // 正则表达式，用于匹配消息内容
-
-    val desc: String = "无描述",
-
-    val isBoot: Boolean = false,// 监听是否需要开机，为 false 时关机不监听
-    val permit: PermitEnum = PermitEnum.MEMBER,// 监听方法的权限
+data class ListenerPatternInfo(
+    var raw: String? = null,
+    var regPattern: String? = null,
+//        var regPatternWithGroup: String? = null,
+    var patternMap: Map<String, String>? = null,
+    var function: KFunction<*>,
+    var eventClass: KClass<out Event>,
+    var listener: Listener,
+    var isMessageEvent: Boolean?  = true,
+    var bean: Any
 )
 
 /**

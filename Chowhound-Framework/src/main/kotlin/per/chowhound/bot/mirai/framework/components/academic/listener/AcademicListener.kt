@@ -11,7 +11,7 @@ import per.chowhound.bot.mirai.framework.components.academic.service.ScheduleSer
 import per.chowhound.bot.mirai.framework.components.academic.util.AcademicUtil
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
-import per.chowhound.bot.mirai.framework.config.Listener
+import per.chowhound.bot.mirai.framework.config.listener.Listener
 import java.sql.Date
 import java.time.LocalDate
 
@@ -31,8 +31,6 @@ class AcademicListener(
 
     @Listener("{{index,\\d{1,2}}}")
     suspend fun FriendMessageEvent.viewWeek(index: Long ){
-
-
         scheduleService.getLessonsByWeek(index).let { schedule ->
             academicUtil.getCourseDetailMsg(schedule).forEach { send(it) }
         }

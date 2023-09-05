@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller
 import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.permit.service.PermitService
-import per.chowhound.bot.mirai.framework.config.Listener
+import per.chowhound.bot.mirai.framework.config.listener.Listener
 
 /**
  * @Author: Chowhound
