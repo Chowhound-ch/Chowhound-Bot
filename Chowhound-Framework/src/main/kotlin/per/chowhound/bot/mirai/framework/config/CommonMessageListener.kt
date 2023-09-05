@@ -12,7 +12,8 @@ import per.chowhound.bot.mirai.framework.config.listener.Listener
 @Component
 class CommonMessageListener {
 
-    @Listener(".*", isBoot = true, desc = "默认消息监听器，监听所有消息")
+    @Listener(".*", desc = "默认消息监听器，监听所有消息")
+//    @Filter(isBoot = true)
     suspend fun MessageEvent.defaultMessageListener() {
         logInfo("监听到事件：{}", this)
     }

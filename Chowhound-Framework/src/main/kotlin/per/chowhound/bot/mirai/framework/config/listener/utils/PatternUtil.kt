@@ -7,9 +7,7 @@ import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.MessageEvent
 import org.springframework.core.annotation.AnnotationUtils
-import per.chowhound.bot.mirai.framework.common.utils.LoggerUtils.logInfo
 import per.chowhound.bot.mirai.framework.config.listener.Listener
-import per.chowhound.bot.mirai.framework.config.listener.log
 import per.chowhound.bot.mirai.framework.config.listener.utils.EventClassUtil.getIfEvent
 import per.chowhound.bot.mirai.framework.config.listener.utils.EventClassUtil.isMessageEvent
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -30,8 +28,8 @@ object PatternUtil {
 //    private const val DEFAULT_GROUP_NAME = "DEFAULT"
 
     // `name,\\s+`
-    fun Class<*>.resolve(bean: Any): List<ListenerPatternInfo> {
-        val list = ArrayList<ListenerPatternInfo>()
+    fun Class<*>.resolve(bean: Any): List<ListenerInfo> {
+        val list = ArrayList<ListenerInfo>()
         this.kotlin.declaredFunctions.forEach { function->
             val listener = AnnotationUtils.getAnnotation(function.javaMethod!!,
                 Listener::class.java) ?: return@forEach
@@ -44,8 +42,8 @@ object PatternUtil {
                 .limit(1).toList()[0]
             ?: return@forEach
             val event = eventClass.getIfEvent() ?: throw RuntimeException("不是事件类型")
-            val info = ListenerPatternInfo(function = function, eventClass = event,
-                bean = bean, listener = listener)
+            val info = ListenerInfo(function = function, eventClass = event,
+                bean = bean, listenerAnn = listener)
 
             if (event.isMessageEvent()){
                 val patternMap = HashMap<String, String>()
@@ -109,14 +107,14 @@ object PatternUtil {
 
 
 }
-data class ListenerPatternInfo(
+data class ListenerInfo(
     var raw: String? = null,
     var regPattern: String? = null,
 //        var regPatternWithGroup: String? = null,
     var patternMap: Map<String, String>? = null,
     var function: KFunction<*>,
     var eventClass: KClass<out Event>,
-    var listener: Listener,
+    var listenerAnn: Listener,
     var isMessageEvent: Boolean?  = true,
     var bean: Any
 )

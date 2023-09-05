@@ -8,6 +8,7 @@ import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.state.enums.GroupStateEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
+import per.chowhound.bot.mirai.framework.config.Filter
 import per.chowhound.bot.mirai.framework.config.listener.Listener
 
 /**
@@ -22,7 +23,8 @@ class GroupStateListener {
     @Resource
     lateinit var groupStateService: GroupStateService
 
-    @Listener("^/status\\s*{{desState}}", permit = PermitEnum.ADMIN, isBoot = true, desc = "修改群状态")
+    @Listener("^/status\\s*{{desState}}", desc = "修改群状态")
+    @Filter(permit = PermitEnum.ADMIN, isBoot = true)
     suspend fun GroupMessageEvent.updateGroupState(desState: String) {
 
         val groupState = groupStateService.getGroupState(group.id)

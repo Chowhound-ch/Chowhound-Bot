@@ -12,6 +12,7 @@ import per.chowhound.bot.mirai.framework.components.academic.util.AcademicUtil
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
 import per.chowhound.bot.mirai.framework.config.listener.Listener
+import per.chowhound.bot.mirai.framework.config.listener.log
 import java.sql.Date
 import java.time.LocalDate
 

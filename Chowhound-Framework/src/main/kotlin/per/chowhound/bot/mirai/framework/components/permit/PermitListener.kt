@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller
 import per.chowhound.bot.mirai.framework.common.MessageSender.send
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.permit.service.PermitService
+import per.chowhound.bot.mirai.framework.config.Filter
 import per.chowhound.bot.mirai.framework.config.listener.Listener
 
 /**
@@ -17,7 +18,8 @@ import per.chowhound.bot.mirai.framework.config.listener.Listener
 class PermitListener(val permitService: PermitService) {
 
 
-    @Listener("/permit\\s*{{qqNumber,@?}}\\s*{{desPermit}}", permit = PermitEnum.OWNER, isBoot = true, desc = "修改权限(直接输入qq号和权限名)")
+    @Listener("/permit\\s*{{qqNumber,@?}}\\s*{{desPermit}}",  desc = "修改权限(直接输入qq号和权限名)")
+    @Filter(permit = PermitEnum.OWNER, isBoot = true)
     suspend fun GroupMessageEvent.updatePermit(qqNumber: Long, desPermit: String) {
         if (!group.contains(qqNumber)) {
             send("不能修改非群成员的权限")

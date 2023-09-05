@@ -21,8 +21,8 @@ object MessageSender {
 
     suspend fun MessageEvent.send(message: String): MessageReceipt<Contact> = this.subject.sendMessage(message)
 
-    suspend fun MessageEvent.reply(message: MessageChain): MessageReceipt<Contact> = this.send(QuoteReply(message))
+    suspend fun MessageEvent.reply(message: Message): MessageReceipt<Contact> = this.send(messageChainOf(QuoteReply(this.source)) + message)
 
-    suspend fun MessageEvent.reply(message: String): MessageReceipt<Contact> = this.send(QuoteReply(messageChainOf(PlainText(message))))
+    suspend fun MessageEvent.reply(message: String): MessageReceipt<Contact> = this.reply(PlainText(message))
 
 }
