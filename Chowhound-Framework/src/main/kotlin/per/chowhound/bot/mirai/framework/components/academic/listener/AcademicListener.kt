@@ -11,6 +11,7 @@ import per.chowhound.bot.mirai.framework.components.academic.service.ScheduleSer
 import per.chowhound.bot.mirai.framework.components.academic.util.AcademicUtil
 import per.chowhound.bot.mirai.framework.components.permit.enums.PermitEnum
 import per.chowhound.bot.mirai.framework.components.state.service.GroupStateService
+import per.chowhound.bot.mirai.framework.config.Filter
 import per.chowhound.bot.mirai.framework.config.listener.Listener
 import per.chowhound.bot.mirai.framework.config.listener.log
 import java.sql.Date
@@ -102,7 +103,8 @@ class AcademicListener(
     }
 
 
-    @Listener("刷新课表", permit = PermitEnum.OWNER)
+    @Listener("刷新课表")
+    @Filter(permit = PermitEnum.ADMIN)
     suspend fun FriendMessageEvent.refreshSchedule() = send( academic.refresh() )
 
 
