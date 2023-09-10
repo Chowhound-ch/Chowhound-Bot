@@ -115,6 +115,7 @@ data class ListenerInfo(
     var function: KFunction<*>,
     var eventClass: KClass<out Event>,
     var listenerAnn: Listener,
+    var listener: net.mamoe.mirai.event.Listener<*>? = null,
     var isMessageEvent: Boolean?  = true,
     var bean: Any
 )

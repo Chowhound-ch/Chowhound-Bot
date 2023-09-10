@@ -2,6 +2,7 @@ package per.chowhound.bot.mirai.framework.components.academic.listener
 
 import cn.hutool.core.date.DateUnit
 import cn.hutool.core.date.DateUtil
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import org.springframework.stereotype.Component
 import per.chowhound.bot.mirai.framework.common.MessageSender.send
