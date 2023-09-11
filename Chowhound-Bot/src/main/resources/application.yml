@@ -27,6 +27,8 @@ logging:
     per.chowhound: debug
 
 spring:
+#  main:
+#    allow-circular-references: true
   profiles:
     include: dev, ${chowhound.storage.type:local}
   aop:

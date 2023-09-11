@@ -5,6 +5,7 @@ import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 import per.chowhound.bot.mirai.framework.common.MessageSender.reply
 import per.chowhound.bot.mirai.framework.config.listener.Listener
@@ -15,7 +16,7 @@ import kotlin.reflect.full.declaredMemberExtensionFunctions
  * @author : Chowhound
  * @since : 2023/9/5 - 18:57
  */
-
+@Lazy
 @Component
 class TestListener{
     @Autowired
